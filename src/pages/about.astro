@@ -3,26 +3,391 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL;
+
+type Category = 'milestone' | 'feature' | 'design' | 'launch';
+
+interface TimelineEvent {
+	category: Category;
+	title: string;
+	date: string;
+	description?: string;
+	highlight?: boolean;
+	side: 'left' | 'right';
+}
+
+const catMeta: Record<Category, { label: string; color: string }> = {
+	milestone: { label: 'Milestone', color: '#e11d48' },
+	feature: { label: 'Feature', color: '#2563eb' },
+	design: { label: 'Design', color: '#d97706' },
+	launch: { label: 'Launch', color: '#16a34a' },
+};
+
+const events: TimelineEvent[] = [
+	{
+		category: 'milestone',
+		title: '博客上线',
+		date: 'Aug 2026',
+		description: '用 Astro 搭建个人博客，部署到 GitHub Pages。',
+		highlight: true,
+		side: 'left',
+	},
+	{
+		category: 'launch',
+		title: 'AI 管家',
+		date: 'Aug 2026',
+		description: '本地 Docker 跑通 Ollama + Home Assistant，语音控全屋。',
+		side: 'right',
+	},
+	{
+		category: 'design',
+		title: '智能家居架构',
+		date: 'Jul 2026',
+		description: '规划 ESP32-S3 网关 + ESP32-C3 终端的分布式家庭自动化方案。',
+		side: 'left',
+	},
+	{
+		category: 'feature',
+		title: '深入嵌入式',
+		date: 'May 2026',
+		description: '从 Arduino 进阶到 ESP-IDF，玩转 FreeRTOS、低功耗与无线协议。',
+		side: 'right',
+	},
+	{
+		category: 'milestone',
+		title: 'Hello, World',
+		date: '很久以前',
+		description: '在编辑器里敲下第一行代码，从此入坑。',
+		side: 'left',
+	},
+];
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={`关于 · ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 880px;
+				margin: 0 auto;
+				padding: 3em 1em 4em;
+			}
+			.intro {
+				max-width: 640px;
+				margin-bottom: 3em;
+			}
+			.kicker {
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.15em;
+				text-transform: uppercase;
+				color: var(--accent);
+				margin: 0 0 1rem;
+			}
+			.kicker::before {
+				content: '— ';
+			}
+			h1 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: clamp(2.5rem, 6vw, 3.5rem);
+				line-height: 1.05;
+				margin: 0 0 1rem;
+			}
+			h1 em {
+				font-style: italic;
+				color: var(--accent);
+			}
+			.intro p {
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				margin: 0 0 1rem;
+			}
+
+			.timeline {
+				position: relative;
+				padding: 1rem 0;
+			}
+			.timeline::before {
+				content: '';
+				position: absolute;
+				left: 50%;
+				top: 0;
+				bottom: 0;
+				width: 2px;
+				background: linear-gradient(
+					to bottom,
+					transparent,
+					rgb(var(--gray-light)) 8%,
+					rgb(var(--gray-light)) 92%,
+					transparent
+				);
+				transform: translateX(-50%);
+			}
+
+			.event {
+				display: grid;
+				grid-template-columns: 1fr 24px 1fr;
+				align-items: center;
+				margin: 1.25rem 0;
+			}
+
+			.card {
+				background: white;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				padding: 1rem 1.25rem;
+				position: relative;
+				transition: transform 200ms ease, box-shadow 200ms ease,
+					border-color 200ms ease;
+			}
+
+			.event.left .card {
+				grid-column: 1;
+				margin-right: 1.5rem;
+				text-align: right;
+			}
+			.event.right .card {
+				grid-column: 3;
+				margin-left: 1.5rem;
+			}
+
+			.card::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				width: 1.5rem;
+				height: 1px;
+				background: rgb(var(--gray-light));
+				transition: background 200ms ease;
+			}
+			.event.left .card::after {
+				right: -1.5rem;
+			}
+			.event.right .card::after {
+				left: -1.5rem;
+			}
+
+			.node {
+				grid-column: 2;
+				width: 14px;
+				height: 14px;
+				border-radius: 50%;
+				background: white;
+				border: 2px solid currentColor;
+				justify-self: center;
+				position: relative;
+				z-index: 2;
+				box-shadow: 0 0 0 4px white;
+				transition: box-shadow 200ms ease, transform 200ms ease;
+			}
+
+			.event:hover .card {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 24px rgba(var(--gray), 15%);
+			}
+			.event:hover .node {
+				box-shadow: 0 0 0 4px white, 0 0 0 6px rgb(var(--gray-light));
+				transform: scale(1.15);
+			}
+			.event:hover .card::after {
+				background: currentColor;
+			}
+
+			.event.highlight .card {
+				border-color: var(--accent);
+				box-shadow: 0 0 0 1px var(--accent), 0 8px 24px rgba(37, 99, 235, 12%);
+			}
+
+			.cat {
+				font-size: 0.7rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				margin: 0;
+			}
+			.title {
+				margin: 0.25rem 0 0;
+				font-size: 1.1rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+			}
+			.date {
+				margin: 0.15rem 0 0;
+				font-size: 0.8rem;
+				color: rgb(var(--gray));
+			}
+			.desc {
+				margin: 0.5rem 0 0;
+				font-size: 0.9rem;
+				line-height: 1.55;
+				color: rgb(var(--gray-dark));
+			}
+
+			.legend {
+				display: flex;
+				gap: 1.5rem;
+				margin-top: 3rem;
+				padding-top: 1.5rem;
+				border-top: 1px solid rgb(var(--gray-light));
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+				flex-wrap: wrap;
+			}
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.legend-line {
+				width: 1.25rem;
+				height: 2px;
+				background: rgb(var(--gray));
+			}
+			.legend-node {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+				border: 2px solid rgb(var(--gray));
+				background: white;
+			}
+			.legend-card {
+				width: 1.25rem;
+				height: 0.75rem;
+				border: 1px solid rgb(var(--gray));
+				border-radius: 3px;
+			}
+			.legend-cats {
+				display: flex;
+				gap: 1rem;
+				margin-left: auto;
+				flex-wrap: wrap;
+			}
+			.legend-cats .cat {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+				font-size: 0.8rem;
+			}
+			.legend-cats .dot {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				display: inline-block;
+			}
+
+			.contact {
+				margin-top: 3rem;
+				padding: 1.5rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				background: linear-gradient(var(--gray-gradient)) no-repeat;
+				background-size: 100% 600px;
+			}
+			.contact p {
+				margin: 0 0 0.5rem;
+			}
+			.contact a {
+				font-weight: 600;
+			}
+
+			@media (max-width: 720px) {
+				.timeline::before {
+					left: 1rem;
+				}
+				.event {
+					grid-template-columns: 1.75rem 1fr;
+				}
+				.event .node {
+					grid-column: 1;
+				}
+				.event.left .card,
+				.event.right .card {
+					grid-column: 2;
+					text-align: left;
+					margin-left: 1rem;
+					margin-right: 0;
+				}
+				.event.left .card::after,
+				.event.right .card::after {
+					left: -1rem;
+					right: auto;
+					width: 1rem;
+				}
+				.legend-cats {
+					margin-left: 0;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>关于我</h1>
-			<p>你好，我是 yihujiua 👋</p>
-			<p>
-				一个爱折腾的开发者。这里主要记录我在智能家居、嵌入式开发（ESP32）、AI 应用和开源工具上的
-				实践笔记，既是备忘，也希望帮到同样在折腾的人。
-			</p>
-			<p>如果你对我的文章有任何问题，欢迎在 GitHub 上交流：</p>
-			<ul>
-				<li><a href="https://github.com/yihujiua" target="_blank">github.com/yihujiua</a></li>
-			</ul>
+			<section class="intro">
+				<p class="kicker">About — 个人简介</p>
+				<h1>我的<em>折腾</em>旅程</h1>
+				<p>
+					你好，我是 <strong>yihujiua</strong> 👋。一个爱折腾的开发者，
+					喜欢把脑子里的想法变成能跑的东西。
+					这里记录我在智能家居、嵌入式开发、AI 应用和开源工具上的实践笔记。
+				</p>
+			</section>
+
+			<section class="timeline" aria-label="项目时间线">
+				{
+					events.map((ev) => {
+						const meta = catMeta[ev.category];
+						return (
+							<div
+								class:list={['event', ev.side, { highlight: ev.highlight }]}
+								style={`color: ${meta.color};`}
+							>
+								<article class="card">
+									<p class="cat">{meta.label}</p>
+									<h3 class="title">{ev.title}</h3>
+									<p class="date">{ev.date}</p>
+									{ev.description && <p class="desc">{ev.description}</p>}
+								</article>
+								<div class="node" aria-hidden="true" />
+							</div>
+						);
+					})
+				}
+			</section>
+
+			<div class="legend" aria-label="图例">
+				<div class="legend-item">
+					<span class="legend-line" /> Central spine (2px)
+				</div>
+				<div class="legend-item">
+					<span class="legend-node" /> Circular node
+				</div>
+				<div class="legend-item">
+					<span class="legend-card" /> Content card
+				</div>
+				<div class="legend-cats">
+					{
+						Object.entries(catMeta).map(([key, meta]) => (
+							<span class="cat" style={`color: ${meta.color};`}>
+								<span class="dot" style={`background: ${meta.color};`} />
+								{meta.label}
+							</span>
+						))
+					}
+				</div>
+			</div>
+
+			<section class="contact">
+				<p><strong>联系我 →</strong></p>
+				<p>
+					GitHub：
+					<a href="https://github.com/yihujiua" target="_blank" rel="noopener">
+						github.com/yihujiua
+					</a>
+				</p>
+				<p>欢迎一起折腾、一起交流项目想法。</p>
+			</section>
 		</main>
 		<Footer />
 	</body>
