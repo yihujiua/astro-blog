@@ -1,39 +1,284 @@
 ---
 const today = new Date();
+const base = import.meta.env.BASE_URL;
 ---
 
 <footer>
-	&copy; {today.getFullYear()} yihujiua. All rights reserved.
-	<div class="social-links">
-		<a href="https://github.com/yihujiua" target="_blank">
-			<span class="sr-only">GitHub</span>
-			<svg viewBox="0 0 16 16" aria-hidden="true" width="28" height="28"
-				><path
-					fill="currentColor"
-					d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-				></path></svg
-			>
-		</a>
+	<div class="footer-inner">
+		<div class="top">
+			<div class="brand">
+				<div class="logo-row">
+					<span class="logo-mark" aria-hidden="true">
+						<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+						</svg>
+					</span>
+					<h3 class="brand-title">Sketched</h3>
+				</div>
+				<p class="brand-desc">
+					个人技术笔记，折腾点好玩的东西：智能家居、AI 管家、嵌入式。
+					<br />手绘风，保留一点不完美的温度。
+				</p>
+				<div class="palette" aria-label="主题色">
+					<span class="swatch" style="background:#111" title="Pencil Gray"></span>
+					<span class="swatch" style="background:#f4ecd8" title="Paper Cream"></span>
+					<span class="swatch" style="background:#e63946" title="Sketch Red"></span>
+					<span class="swatch" style="background:#2a6f97" title="Ink Blue"></span>
+					<span class="swatch" style="background:#52b788" title="Leaf Green"></span>
+					<span class="swatch" style="background:#f4a261" title="Warm Orange"></span>
+				</div>
+			</div>
+
+			<div class="cols">
+				<div class="col">
+					<h4 class="col-title">导航</h4>
+					<a href={base}>首页</a>
+					<a href={`${base}blog/`}>博客</a>
+					<a href={`${base}about/`}>关于</a>
+				</div>
+				<div class="col">
+					<h4 class="col-title">主题</h4>
+					<a href={`${base}blog/?tag=ESP32`}>ESP32</a>
+					<a href={`${base}blog/?tag=AI`}>AI 管家</a>
+					<a href={`${base}blog/?tag=智能家居`}>智能家居</a>
+				</div>
+				<div class="col">
+					<h4 class="col-title">链接</h4>
+					<a href="https://github.com/yihujiua" target="_blank" rel="noopener">GitHub ↗</a>
+					<a href={`${base}rss.xml`}>RSS 订阅</a>
+					<a href="mailto:hi@yihujiua.com">写信给我</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="divider" aria-hidden="true"></div>
+
+		<div class="bottom">
+			<div class="signature">
+				<span>Sketched for</span>
+				<span class="star" aria-hidden="true">✺</span>
+				<span class="sig-name">yihujiua</span>
+				<span class="squiggle" aria-hidden="true">
+					<svg viewBox="0 0 40 8" width="32" height="6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+						<path d="M2 4 Q 7 0, 12 4 T 22 4 T 32 4 T 38 4" />
+					</svg>
+				</span>
+			</div>
+			<a class="back-btn" href={base}>
+				<span aria-hidden="true">←</span>
+				<span>Back to Home</span>
+			</a>
+		</div>
+
+		<p class="copy">© {today.getFullYear()} yihujiua · 保留所有权利</p>
 	</div>
 </footer>
+
 <style>
 	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-	}
-	.social-links a:hover {
+		margin-top: 4em;
+		padding: 3em 1.5em 2em;
+		background: linear-gradient(
+			180deg,
+			rgb(var(--gray-light)) 0%,
+			rgba(var(--gray-light), 0.4) 100%
+		);
 		color: rgb(var(--gray-dark));
+		font-family: 'Kalam', 'Comic Sans MS', 'Marker Felt', cursive, ui-serif, Georgia, serif;
+	}
+
+	.footer-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	/* ── Top: brand + columns ── */
+	.top {
+		display: grid;
+		grid-template-columns: 1.4fr 2fr;
+		gap: 4rem;
+		align-items: start;
+	}
+
+	/* Brand block */
+	.logo-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin-bottom: 0.85rem;
+	}
+	.logo-mark {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border: 1.5px dashed currentColor;
+		border-radius: 4px;
+		color: rgb(var(--black));
+	}
+	.brand-title {
+		font-family: ui-serif, Georgia, 'Times New Roman', serif;
+		font-size: 1.4rem;
+		font-weight: 700;
+		font-style: italic;
+		margin: 0;
+		color: rgb(var(--black));
+		letter-spacing: -0.01em;
+	}
+	.brand-desc {
+		max-width: 360px;
+		font-size: 0.92rem;
+		line-height: 1.65;
+		color: rgb(var(--gray-dark));
+		margin: 0 0 1.25rem;
+	}
+	.palette {
+		display: flex;
+		gap: 0.45rem;
+		flex-wrap: wrap;
+	}
+	.swatch {
+		width: 22px;
+		height: 22px;
+		border: 1.5px solid rgb(var(--gray));
+		border-radius: 3px;
+		box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.08);
+	}
+
+	/* Column lists */
+	.cols {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem;
+	}
+	.col-title {
+		font-family: ui-serif, Georgia, serif;
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		margin: 0 0 0.9rem;
+		color: rgb(var(--black));
+	}
+	.col a {
+		display: block;
+		font-family: ui-serif, Georgia, serif;
+		font-size: 0.92rem;
+		font-style: italic;
+		text-decoration: underline;
+		text-decoration-style: wavy;
+		text-underline-offset: 4px;
+		text-decoration-color: rgba(var(--gray), 0.4);
+		color: rgb(var(--gray-dark));
+		padding: 0.18rem 0;
+		transition: color 200ms ease;
+	}
+	.col a:hover {
+		color: rgb(var(--black));
+		text-decoration-color: rgb(var(--accent));
+	}
+
+	/* ── Divider ── */
+	.divider {
+		margin: 2.5rem 0 1.5rem;
+		border-top: 1.5px dashed rgba(var(--gray), 0.5);
+		position: relative;
+	}
+	.divider::before {
+		content: '';
+		position: absolute;
+		top: -3px;
+		left: 0;
+		width: 16px;
+		height: 6px;
+		background: rgb(var(--gray-light));
+	}
+
+	/* ── Bottom: signature + back button ── */
+	.bottom {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+	.signature {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: ui-serif, Georgia, serif;
+		font-style: italic;
+		font-size: 0.95rem;
+		color: rgb(var(--gray));
+	}
+	.star {
+		color: rgb(var(--accent));
+		font-size: 0.85rem;
+	}
+	.sig-name {
+		font-weight: 700;
+		color: rgb(var(--black));
+	}
+	.squiggle {
+		display: inline-flex;
+		color: rgb(var(--gray));
+	}
+
+	.back-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: ui-serif, Georgia, serif;
+		font-style: italic;
+		font-size: 0.92rem;
+		text-decoration: none;
+		color: rgb(var(--black));
+		padding: 0.55rem 1.1rem;
+		border: 1.5px dashed rgb(var(--gray));
+		border-radius: 6px;
+		background: rgba(255, 255, 255, 0.5);
+		transition: all 200ms ease;
+	}
+	.back-btn:hover {
+		border-color: rgb(var(--accent));
+		color: rgb(var(--accent));
+		transform: translateY(-1px);
+	}
+
+	.copy {
+		text-align: center;
+		font-family: ui-serif, Georgia, serif;
+		font-size: 0.78rem;
+		color: rgb(var(--gray));
+		margin: 1.5rem 0 0;
+		letter-spacing: 0.05em;
+	}
+
+	/* Responsive */
+	@media (max-width: 720px) {
+		footer {
+			padding: 2em 1.25em 1.5em;
+		}
+		.top {
+			grid-template-columns: 1fr;
+			gap: 2.5rem;
+		}
+		.cols {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 1.25rem;
+		}
+		.col a {
+			font-size: 0.82rem;
+		}
+		.bottom {
+			justify-content: center;
+			text-align: center;
+		}
+	}
+	@media (max-width: 480px) {
+		.cols {
+			grid-template-columns: 1fr 1fr;
+		}
 	}
 </style>

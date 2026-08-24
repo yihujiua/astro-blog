@@ -1,20 +1,120 @@
 ---
-import { type CollectionEntry, getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
 
-export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
+export function getStaticPaths() {
+	const modules = import.meta.glob('/src/content/blog/*.md', { eager: true });
+	return Object.entries(modules).map(([path, mod]) => {
+		const slug = path.split('/').pop()!.replace(/\.md$/, '');
+		return { params: { slug }, props: { post: mod } };
+	});
 }
-type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props;
-const { Content } = await render(post);
+const { slug } = Astro.params;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mod: any = Astro.props.post;
+const rawFm = mod.frontmatter;
+const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
+const title = String(fm.title ?? slug);
+const description = String(fm.description ?? '');
+const tags = Array.isArray(fm.tags) ? fm.tags.map(String) : [];
+const pubDate = String(fm.pubDate ?? '');
+const rawHtml: string = (typeof mod.compiledContent === 'function' ? mod.compiledContent() : mod.compiledContent) ?? '';
+const base = import.meta.env.BASE_URL;
 ---
 
-<BlogPost {...post.data}>
-	<Content />
-</BlogPost>
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			main {
+				max-width: 720px;
+				margin: 0 auto;
+				padding: 3em 1.5em 6em;
+			}
+			.back {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.4rem;
+				text-decoration: none;
+				color: rgb(var(--gray));
+				font-size: 0.875rem;
+				margin-bottom: 2.5rem;
+			}
+			.back:hover { color: var(--accent); }
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin: 0 0 1rem;
+			}
+			.tag {
+				font-size: 0.72rem;
+				font-weight: 600;
+				padding: 0.3rem 0.75rem;
+				border-radius: 999px;
+				background: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+			}
+			h1 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+				letter-spacing: -0.02em;
+				line-height: 1.15;
+				margin: 0 0 1.25rem;
+			}
+			time {
+				display: block;
+				font-size: 0.875rem;
+				color: rgb(var(--gray));
+				margin-bottom: 2rem;
+			}
+			article {
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				font-size: 0.95rem;
+			}
+			article :global(h2) {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.3rem;
+				margin: 2em 0 0.5em;
+				color: rgb(var(--black));
+			}
+			article :global(p) { margin: 0 0 1em; }
+			article :global(ul), article :global(ol) { padding-left: 1.5em; margin: 0 0 1em; }
+			article :global(code) {
+				background: rgb(var(--gray-light));
+				padding: 0.1em 0.35em;
+				border-radius: 3px;
+				font-size: 0.9em;
+			}
+			article :global(strong) { color: rgb(var(--black)); }
+			article :global(pre) {
+				background: rgb(var(--gray-light));
+				padding: 1.25em;
+				border-radius: 8px;
+				overflow-x: auto;
+				margin: 1.5em 0;
+			}
+			article :global(pre code) { background: none; padding: 0; font-size: 0.875rem; }
+			@media (max-width: 600px) {
+				main { padding: 2em 1.25em 4em; }
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<a class="back" href={`${base}blog/`}>← 博客列表</a>
+			<div class="tags">
+				{tags.map((t: string) => <span class="tag">{t}</span>)}
+			</div>
+			<h1>{title}</h1>
+			<time>{pubDate}</time>
+			<article set:html={rawHtml} />
+		</main>
+		<Footer />
+	</body>
+</html>

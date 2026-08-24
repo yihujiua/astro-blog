@@ -2,6 +2,7 @@
 title: 'ESP32 全屋智能：架构选型笔记'
 description: 'S3 网关 + C3 电池节点的架构为什么这么选'
 pubDate: '2026-08-24'
+tags: ['ESP32', 'IoT', 'Architecture']
 ---
 
 做全屋智能，最关键的决策是**通信架构**。分享一下我的选型过程。

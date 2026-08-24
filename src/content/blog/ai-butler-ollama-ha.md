@@ -2,6 +2,7 @@
 title: 'AI 管家：Ollama + Home Assistant 本地部署'
 description: '数据不出家的智能家居对话助手'
 pubDate: '2026-08-25'
+tags: ['AI', 'Smart Home', 'Docker']
 ---
 
 给智能家居加一个能对话的"管家"，其实很简单：**本地大模型 + Home Assistant**，数据全程不出家门。
