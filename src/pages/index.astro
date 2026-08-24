@@ -4,57 +4,8 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-// Vite glob — each value is the markdown module, frontmatter is a named export
-const modules = import.meta.glob('/src/content/blog/*.md', { eager: true });
 const base = import.meta.env.BASE_URL;
-
-interface PostData {
-	id: string;
-	title: string;
-	description: string;
-	author: string;
-	pubDate: string;
-	tags: string[];
-	body: string;
-	readMinutes: number;
-}
-
-const data: PostData[] = Object.entries(modules)
-	.map(([path, mod]) => {
-		const rawFm = (mod as any).frontmatter;
-		const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
-		const slug = path.split('/').pop()!.replace(/\.md$/, '');
-		const raw: string = (typeof (mod as any).rawContent === 'function' ? (mod as any).rawContent() : (mod as any).rawContent) ?? '';
-		const stripped = raw
-			.replace(/```[\s\S]*?```/g, ' ')
-			.replace(/`[^`]*`/g, ' ')
-			.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-			.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-			.replace(/[#>*_\-]/g, ' ');
-		const words = stripped.trim().split(/\s+/).filter(Boolean).length;
-		const readMinutes = Math.max(1, Math.round(words / 280));
-		return {
-			id: slug,
-			title: String(fm.title ?? slug),
-			description: String(fm.description ?? ''),
-			author: 'yihujiua',
-			pubDate: String(fm.pubDate ?? ''),
-			tags: Array.isArray(fm.tags) ? fm.tags.map(String) : [],
-			body: raw,
-			readMinutes,
-		};
-	})
-	.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-
-function pad(n: number) {
-	return n.toString().padStart(2, '0');
-}
-function year(date: string) {
-	return new Date(date).getFullYear();
-}
-function monthShort(date: string) {
-	return new Date(date).toLocaleString('en-US', { month: 'short' });
-}
+const total = Object.keys(import.meta.glob('/src/content/blog/*.md')).length;
 ---
 
 <!doctype html>
@@ -63,13 +14,14 @@ function monthShort(date: string) {
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
-				max-width: 1200px;
+				max-width: 760px;
 				margin: 0 auto;
-				padding: 3em 2em 6em;
+				padding: 5em 1.5em 6em;
 			}
 
 			.hero {
-				padding: 3em 0 4em;
+				padding: 0 0 2.5em;
+				border-bottom: 1px solid rgb(var(--gray-light));
 			}
 			.hero h1 {
 				font-family: ui-serif, Georgia, 'Times New Roman', serif;
@@ -86,348 +38,60 @@ function monthShort(date: string) {
 				max-width: 560px;
 				color: rgb(var(--gray));
 				line-height: 1.7;
-				margin: 0;
+				margin: 0 0 1.75rem;
 			}
 
-			.list {
-				list-style: none;
-				margin: 0;
-				padding: 0;
-			}
-			.item {
-				display: grid;
-				grid-template-columns: 64px 1fr 160px 60px;
-				align-items: center;
-				gap: 2rem;
-				padding: 1.5rem 0;
-				border-top: 1px solid rgb(var(--gray-light));
-				color: inherit;
-				cursor: pointer;
-				background: transparent;
-				border-left: 0;
-				border-right: 0;
-				border-bottom: 0;
-				width: 100%;
-				text-align: left;
-				font: inherit;
-				transition: padding 250ms ease;
-			}
-			.item:last-child {
-				border-bottom: 1px solid rgb(var(--gray-light));
-			}
-
-			.num {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 0.95rem;
-				color: rgb(var(--gray));
-				letter-spacing: 0.05em;
-			}
-
-			.title {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: clamp(1.5rem, 2.6vw, 2.25rem);
-				font-weight: 600;
-				line-height: 1.1;
-				margin: 0;
-				color: rgb(var(--black));
-				letter-spacing: -0.01em;
-				transition: transform 250ms ease, color 250ms ease;
-			}
-			.item:hover .title,
-			.item:focus-visible .title {
-				transform: translateX(8px);
-				color: var(--accent);
-			}
-			.item:focus-visible {
-				outline: none;
-			}
-			.item:focus-visible .title {
-				color: var(--accent);
-			}
-
-			.meta {
-				font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-				font-size: 0.75rem;
-				letter-spacing: 0.1em;
-				color: rgb(var(--gray));
-				text-transform: uppercase;
-				white-space: nowrap;
-				text-align: right;
-			}
-
-			.thumb {
-				width: 100%;
-				aspect-ratio: 1 / 1;
-				background: linear-gradient(
-					135deg,
-					rgb(var(--gray-light)) 0%,
-					#d8dde8 100%
-				);
-				border-radius: 4px;
-				position: relative;
-				overflow: hidden;
-				transition: transform 250ms ease;
-			}
-			.item:hover .thumb {
-				transform: scale(1.05);
-			}
-			.thumb::after {
-				content: '';
-				position: absolute;
-				inset: 0;
-				background: linear-gradient(
-					45deg,
-					transparent 48%,
-					rgba(255, 255, 255, 0.4) 50%,
-					transparent 52%
-				);
-			}
-
-			.arrow {
-				font-size: 1.5rem;
-				color: rgb(var(--black));
-				justify-self: end;
-				transition: transform 250ms ease;
-			}
-			.item:hover .arrow,
-			.item:focus-visible .arrow {
-				transform: translateX(8px);
-			}
-
-			.footer-link {
-				margin-top: 3em;
+			.cta {
 				display: inline-flex;
 				align-items: center;
-				gap: 0.75rem;
+				gap: 0.5rem;
+				padding: 0.7em 1.4em;
+				background: rgb(var(--black));
+				color: white;
 				text-decoration: none;
-				color: rgb(var(--black));
+				border-radius: 6px;
 				font-weight: 600;
-				border-bottom: 1px solid rgb(var(--black));
-				padding-bottom: 0.25em;
+				font-size: 0.95rem;
+				transition: background 200ms ease, transform 200ms ease;
 			}
-			.footer-link:hover {
-				color: var(--accent);
-				border-color: var(--accent);
-			}
-
-			/* Modal */
-			.modal {
-				position: fixed;
-				inset: 0;
-				background: rgba(15, 18, 25, 0.55);
-				display: none;
-				align-items: flex-start;
-				justify-content: center;
-				padding: 6vh 1.25em;
-				z-index: 50;
-				opacity: 0;
-				transition: opacity 200ms ease;
-				overflow-y: auto;
-			}
-			.modal.open {
-				display: flex;
-				opacity: 1;
-			}
-			.dialog {
-				position: relative;
-				background: white;
-				width: min(720px, 100%);
-				border-radius: 16px;
-				padding: 2.5rem 3rem 2rem;
-				box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-				transform: translateY(20px) scale(0.98);
-				transition: transform 250ms ease;
-			}
-			.modal.open .dialog {
-				transform: translateY(0) scale(1);
-			}
-
-			.close {
-				position: absolute;
-				top: 1rem;
-				right: 1rem;
-				width: 2.25rem;
-				height: 2.25rem;
-				border-radius: 50%;
-				background: rgb(var(--gray-light));
-				border: 0;
-				color: rgb(var(--black));
-				font-size: 1.1rem;
-				cursor: pointer;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				transition: background 200ms ease, color 200ms ease;
-			}
-			.close:hover {
+			.cta:hover {
 				background: var(--accent);
-				color: white;
+				transform: translateY(-1px);
 			}
 
-			.tags {
+			.stats {
 				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				margin: 0 0 1.25rem;
-			}
-			.tag {
-				font-size: 0.72rem;
-				font-weight: 600;
-				padding: 0.3rem 0.75rem;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-			}
-			.tag.active {
-				background: #d1fadf;
-				color: #027a48;
-			}
-
-			.modal h2 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: clamp(1.75rem, 3.4vw, 2.25rem);
-				line-height: 1.15;
-				margin: 0 0 1rem;
-				color: rgb(var(--black));
-				letter-spacing: -0.01em;
-			}
-			.byline {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 0.75rem;
-				margin: 0 0 1.5rem;
-				padding-bottom: 1.25rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
-				font-size: 0.85rem;
-				color: rgb(var(--gray));
-			}
-			.avatar {
-				width: 1.75rem;
-				height: 1.75rem;
-				border-radius: 50%;
-				background: linear-gradient(135deg, #6366f1, #8b5cf6);
-				color: white;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 0.75rem;
-				font-weight: 700;
-			}
-			.author {
-				color: rgb(var(--black));
-				font-weight: 600;
-			}
-			.dot {
-				color: rgb(var(--gray));
-			}
-
-			.body {
-				color: rgb(var(--gray-dark));
-				line-height: 1.7;
-				font-size: 0.95rem;
-				margin: 0 0 1.5rem;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-			.body :global(h2) {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.3rem;
-				margin: 1.5em 0 0.5em;
-				color: rgb(var(--black));
-			}
-			.body :global(p) {
-				margin: 0 0 1em;
-			}
-			.body :global(ul),
-			.body :global(ol) {
-				padding-left: 1.5em;
-				margin: 0 0 1em;
-			}
-			.body :global(code) {
-				background: rgb(var(--gray-light));
-				padding: 0.1em 0.35em;
-				border-radius: 3px;
-				font-size: 0.9em;
-			}
-			.body :global(strong) {
-				color: rgb(var(--black));
-			}
-
-			.actions {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				gap: 1rem;
-				margin-top: 1rem;
-				padding-top: 1.25rem;
+				gap: 2.5rem;
+				margin-top: 3em;
+				padding-top: 2em;
 				border-top: 1px solid rgb(var(--gray-light));
-				flex-wrap: wrap;
 			}
-			.back {
-				color: rgb(var(--gray));
-				text-decoration: none;
-				font-size: 0.9rem;
-			}
-			.back:hover {
-				color: var(--accent);
-			}
-			.chips {
+			.stat {
 				display: flex;
-				gap: 0.5rem;
-				flex-wrap: wrap;
+				flex-direction: column;
+				gap: 0.25rem;
 			}
-			.chip {
-				display: inline-flex;
-				align-items: center;
-				gap: 0.3rem;
-				font-size: 0.78rem;
-				font-weight: 600;
-				padding: 0.4rem 0.85rem;
-				border-radius: 999px;
-				border: 1px solid #16a34a;
-				color: #16a34a;
-				background: white;
-				text-decoration: none;
-				transition: background 200ms ease, color 200ms ease;
+			.stat-num {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.75rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				line-height: 1;
 			}
-			.chip:hover {
-				background: #16a34a;
-				color: white;
-			}
-			.chip.alt {
-				border-color: #2563eb;
-				color: #2563eb;
-			}
-			.chip.alt:hover {
-				background: #2563eb;
-				color: white;
+			.stat-label {
+				font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+				font-size: 0.7rem;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: rgb(var(--gray));
 			}
 
 			@media (max-width: 720px) {
 				main {
-					padding: 2em 1.25em 4em;
+					padding: 3em 1.25em 4em;
 				}
-				.item {
-					grid-template-columns: 36px 1fr 40px;
-					gap: 0.75rem;
-				}
-				.thumb,
-				.meta {
-					display: none;
-				}
-				.title {
-					font-size: 1.25rem;
-				}
-				.dialog {
-					padding: 1.75rem 1.5rem 1.5rem;
-				}
-				.actions {
-					flex-direction: column-reverse;
-					align-items: stretch;
-				}
-				.chips {
-					justify-content: flex-end;
+				.stats {
+					gap: 1.5rem;
 				}
 			}
 		</style>
@@ -439,189 +103,28 @@ function monthShort(date: string) {
 				<h1>我的<em>折腾</em>笔记</h1>
 				<p>
 					一个爱折腾的开发者，记录在智能家居、嵌入式开发、AI 与开源工具上的实践。
+					把踩过的坑、跑通的方案、写过的代码都摊在这里。
 				</p>
+				<a class="cta" href={`${base}blog/`}>
+					浏览全部 {total} 篇文章 →
+				</a>
 			</section>
 
-			<ul class="list">
-				{
-					data.map((post, i) => (
-						<li>
-							<button
-								class="item"
-								type="button"
-								data-post-id={post.id}
-								aria-label={`打开文章：${post.title}`}
-							>
-								<span class="num">{pad(i + 1)}</span>
-								<h2 class="title">{post.title}</h2>
-								<span class="meta">
-									Blog — {monthShort(post.pubDate)} {year(post.pubDate)}
-								</span>
-								<span class="thumb" aria-hidden="true" />
-								<span class="arrow" aria-hidden="true">→</span>
-							</button>
-						</li>
-					))
-				}
-			</ul>
-
-			<a class="footer-link" href={`${base}blog/`}>
-				查看全部文章 →
-			</a>
+			<section class="stats">
+				<div class="stat">
+					<span class="stat-num">{total}</span>
+					<span class="stat-label">Articles</span>
+				</div>
+				<div class="stat">
+					<span class="stat-num">3</span>
+					<span class="stat-label">Topics</span>
+				</div>
+				<div class="stat">
+					<span class="stat-num">2026</span>
+					<span class="stat-label">Started</span>
+				</div>
+			</section>
 		</main>
 		<Footer />
-
-		<div
-			class="modal"
-			id="article-modal"
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="modal-title"
-			aria-hidden="true"
-		>
-			<article class="dialog" id="modal-dialog">
-				<button class="close" type="button" id="modal-close" aria-label="关闭">×</button>
-				<div class="tags" id="modal-tags"></div>
-				<h2 id="modal-title"></h2>
-				<div class="byline">
-					<span class="avatar" id="modal-avatar"></span>
-					<span class="author" id="modal-author"></span>
-					<span class="dot">·</span>
-					<span id="modal-date"></span>
-					<span class="dot">·</span>
-					<span id="modal-read"></span>
-				</div>
-				<div class="body" id="modal-body"></div>
-				<div class="actions">
-					<a class="back" id="modal-back" href="#">← 返回文章列表</a>
-					<div class="chips" id="modal-chips"></div>
-				</div>
-			</article>
-		</div>
-
-		<script type="application/json" id="posts-data" set:html={JSON.stringify(data)} />
-
-		<script is:inline>
-			(() => {
-				const data = JSON.parse(
-					document.getElementById('posts-data').textContent || '[]',
-				);
-				const base = document.querySelector('base')?.getAttribute('href') || '/astro-blog/';
-				const modal = document.getElementById('article-modal');
-				const titleEl = document.getElementById('modal-title');
-				const tagsEl = document.getElementById('modal-tags');
-				const avatarEl = document.getElementById('modal-avatar');
-				const authorEl = document.getElementById('modal-author');
-				const dateEl = document.getElementById('modal-date');
-				const readEl = document.getElementById('modal-read');
-				const bodyEl = document.getElementById('modal-body');
-				const chipsEl = document.getElementById('modal-chips');
-				const backEl = document.getElementById('modal-back');
-				const closeBtn = document.getElementById('modal-close');
-				let lastFocus = null;
-
-				function md(text) {
-					const escape = (s) =>
-						s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-					const lines = escape(text).split(/\n/);
-					const out = [];
-					let inUl = false;
-					let inOl = false;
-					let inCode = false;
-					let inP = false;
-					const closeLists = () => {
-						if (inUl) { out.push('</ul>'); inUl = false; }
-						if (inOl) { out.push('</ol>'); inOl = false; }
-					};
-					const closeP = () => { if (inP) { out.push('</p>'); inP = false; } };
-					for (const raw of lines) {
-						const line = raw.trimEnd();
-						if (line.startsWith('```')) {
-							closeP(); closeLists();
-							if (inCode) { out.push('</code></pre>'); inCode = false; }
-							else { out.push('<pre><code>'); inCode = true; }
-							continue;
-						}
-						if (inCode) { out.push(line); continue; }
-						if (!line.trim()) { closeP(); closeLists(); continue; }
-						const h = line.match(/^(#{1,6})\s+(.*)$/);
-						if (h) {
-							closeP(); closeLists();
-							out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);
-							continue;
-						}
-						const ul = line.match(/^[-*+]\s+(.*)$/);
-						if (ul) {
-							closeP();
-							if (!inUl) { closeLists(); out.push('<ul>'); inUl = true; }
-							out.push(`<li>${inline(ul[1])}</li>`);
-							continue;
-						}
-						const ol = line.match(/^\d+\.\s+(.*)$/);
-						if (ol) {
-							closeP();
-							if (!inOl) { closeLists(); out.push('<ol>'); inOl = true; }
-							out.push(`<li>${inline(ol[1])}</li>`);
-							continue;
-						}
-						if (!inP) { closeLists(); out.push('<p>'); inP = true; } else { out.push('<br/>'); }
-						out.push(inline(line));
-					}
-					closeP(); closeLists();
-					if (inCode) out.push('</code></pre>');
-					function inline(s) {
-						return s
-							.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-							.replace(/`([^`]+)`/g, '<code>$1</code>')
-							.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-					}
-					return out.join('');
-				}
-
-				function open(id) {
-					const post = data.find((p) => p.id === id);
-					if (!post) return;
-					lastFocus = document.activeElement;
-					titleEl.textContent = post.title;
-					tagsEl.innerHTML = (post.tags || [])
-						.map((t, i) => `<span class="tag${i === 0 ? ' active' : ''}">${t}</span>`)
-						.join('');
-					avatarEl.textContent = (post.author || '?').slice(0, 2).toUpperCase();
-					authorEl.textContent = post.author;
-					dateEl.textContent = post.pubDate;
-					readEl.textContent = `${post.readMinutes} min read`;
-					bodyEl.innerHTML = md(post.body || '');
-					chipsEl.innerHTML = (post.tags || [])
-						.map(
-							(t, i) =>
-								`<a class="chip${i > 0 ? ' alt' : ''}" href="#">More ${t}</a>`,
-						)
-						.join('');
-					backEl.href = '#';
-					modal.classList.add('open');
-					modal.setAttribute('aria-hidden', 'false');
-					document.body.style.overflow = 'hidden';
-					setTimeout(() => closeBtn.focus(), 50);
-				}
-
-				function close() {
-					modal.classList.remove('open');
-					modal.setAttribute('aria-hidden', 'true');
-					document.body.style.overflow = '';
-					if (lastFocus && lastFocus.focus) lastFocus.focus();
-				}
-
-				document.querySelectorAll('.item[data-post-id]').forEach((btn) => {
-					btn.addEventListener('click', () => open(btn.dataset.postId));
-				});
-				closeBtn.addEventListener('click', close);
-				modal.addEventListener('click', (e) => {
-					if (e.target === modal) close();
-				});
-				document.addEventListener('keydown', (e) => {
-					if (e.key === 'Escape' && modal.classList.contains('open')) close();
-				});
-			})();
-		</script>
 	</body>
 </html>
