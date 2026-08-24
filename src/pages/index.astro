@@ -11,6 +11,7 @@ const base = import.meta.env.BASE_URL;
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			.page {
+				position: relative;
 				min-height: 100vh;
 				display: flex;
 				flex-direction: column;
@@ -19,7 +20,54 @@ const base = import.meta.env.BASE_URL;
 				padding: 4rem 1.5rem;
 				text-align: center;
 				max-width: 100%;
+				overflow: hidden;
 			}
+
+			/* ── Art Nouveau botanical background (4 corners + center halo) ── */
+			.bg-deco {
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				z-index: 0;
+			}
+			.bg-deco > svg {
+				position: absolute;
+				pointer-events: none;
+			}
+			.bg-tl { top: 1.5rem; left: 1.5rem; width: 180px; height: 180px; }
+			.bg-tr { top: 1.5rem; right: 1.5rem; width: 180px; height: 180px; }
+			.bg-bl { bottom: 1.5rem; left: 1.5rem; width: 180px; height: 180px; }
+			.bg-br { bottom: 1.5rem; right: 1.5rem; width: 180px; height: 180px; }
+			.bg-center {
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 480px;
+				max-width: 70vw;
+				opacity: 0.45;
+			}
+			/* Subtle gold/cream paper tint band at top + bottom */
+			.page::before,
+			.page::after {
+				content: '';
+				position: absolute;
+				left: 0;
+				right: 0;
+				height: 38%;
+				pointer-events: none;
+				z-index: 0;
+			}
+			.page::before {
+				top: 0;
+				background: linear-gradient(180deg, rgba(245, 239, 225, 0.6) 0%, rgba(245, 239, 225, 0) 100%);
+			}
+			.page::after {
+				bottom: 0;
+				background: linear-gradient(0deg, rgba(245, 239, 225, 0.4) 0%, rgba(245, 239, 225, 0) 100%);
+			}
+
+			/* ensure content sits above the deco */
+			.page > * { position: relative; z-index: 1; }
 
 			/* ── top eyebrow (small red uppercase label) ── */
 			.eyebrow {
@@ -185,16 +233,129 @@ const base = import.meta.env.BASE_URL;
 
 			@media (max-width: 720px) {
 				.palette { grid-template-columns: repeat(3, 1fr); }
+				.bg-tl, .bg-tr { width: 130px; height: 130px; }
+				.bg-bl, .bg-br { width: 130px; height: 130px; }
+				.bg-center { width: 360px; }
 			}
 			@media (max-width: 480px) {
 				.page { padding: 3rem 1.25rem; }
 				.title { font-size: clamp(2.5rem, 11vw, 4rem); }
 				.palette { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+				.bg-tl, .bg-tr, .bg-bl, .bg-br { width: 100px; height: 100px; }
+				.bg-center { display: none; }
 			}
 		</style>
 	</head>
 	<body>
 		<section class="page">
+			<!-- Art Nouveau botanical background -->
+			<div class="bg-deco" aria-hidden="true">
+				<!-- center: soft sage organic halo + tiny gold flower -->
+				<svg class="bg-center" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M 240 60
+						   C 320 70, 380 130, 400 200
+						   C 420 270, 400 340, 340 390
+						   C 280 440, 200 440, 150 400
+						   C 90 360, 60 290, 80 220
+						   C 100 140, 160 70, 240 60 Z"
+						fill="#E8E4D5" />
+					<!-- tiny gold flower at the very top of the halo -->
+					<g transform="translate(240, 50)">
+						<circle r="14" fill="#D4A24C" />
+						<circle r="6" fill="#2D8659" />
+						<circle r="2" fill="#F5EFE1" />
+					</g>
+				</svg>
+
+				<!-- top-left: curved line + 3 leaves + dot -->
+				<svg class="bg-tl" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+					<!-- gold curving line forming L-shape frame -->
+					<path
+						d="M 10 30 Q 20 15, 40 12 T 80 14 Q 100 16, 115 28 T 150 60 Q 160 78, 168 100"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<path
+						d="M 10 30 Q 12 50, 14 80 T 22 130 Q 28 150, 40 168"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<!-- leaves -->
+					<g transform="translate(30, 30) rotate(-30)">
+						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
+					</g>
+					<g transform="translate(50, 22) rotate(-50)">
+						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
+					</g>
+					<g transform="translate(20, 60) rotate(20)">
+						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
+					</g>
+					<!-- small dots -->
+					<circle cx="100" cy="40" r="2" fill="#D4A24C" />
+					<circle cx="35" cy="100" r="2" fill="#D4A24C" />
+				</svg>
+
+				<!-- top-right: mirror of top-left -->
+				<svg class="bg-tr" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M 170 30 Q 160 15, 140 12 T 100 14 Q 80 16, 65 28 T 30 60 Q 20 78, 12 100"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<path
+						d="M 170 30 Q 168 50, 166 80 T 158 130 Q 152 150, 140 168"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<g transform="translate(150, 30) rotate(30)">
+						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
+					</g>
+					<g transform="translate(130, 22) rotate(50)">
+						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
+					</g>
+					<g transform="translate(160, 60) rotate(-20)">
+						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
+					</g>
+					<circle cx="80" cy="40" r="2" fill="#D4A24C" />
+					<circle cx="145" cy="100" r="2" fill="#D4A24C" />
+				</svg>
+
+				<!-- bottom-left: mirror flipped -->
+				<svg class="bg-bl" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M 10 150 Q 20 165, 40 168 T 80 166 Q 100 164, 115 152 T 150 120 Q 160 102, 168 80"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<path
+						d="M 10 150 Q 12 130, 14 100 T 22 50 Q 28 30, 40 12"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<g transform="translate(30, 150) rotate(30)">
+						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
+					</g>
+					<g transform="translate(50, 158) rotate(50)">
+						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
+					</g>
+					<g transform="translate(20, 120) rotate(-20)">
+						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
+					</g>
+					<circle cx="100" cy="140" r="2" fill="#D4A24C" />
+					<circle cx="35" cy="80" r="2" fill="#D4A24C" />
+				</svg>
+
+				<!-- bottom-right: mirror flipped -->
+				<svg class="bg-br" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M 170 150 Q 160 165, 140 168 T 100 166 Q 80 164, 65 152 T 30 120 Q 20 102, 12 80"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<path
+						d="M 170 150 Q 168 130, 166 100 T 158 50 Q 152 30, 140 12"
+						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
+					<g transform="translate(150, 150) rotate(-30)">
+						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
+					</g>
+					<g transform="translate(130, 158) rotate(-50)">
+						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
+					</g>
+					<g transform="translate(160, 120) rotate(20)">
+						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
+					</g>
+					<circle cx="80" cy="140" r="2" fill="#D4A24C" />
+					<circle cx="145" cy="80" r="2" fill="#D4A24C" />
+				</svg>
+			</div>
+
 			<span class="eyebrow">Sketch Style</span>
 
 			<h1 class="title">
