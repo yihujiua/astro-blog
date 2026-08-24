@@ -9,8 +9,17 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const recentPosts = posts.slice(0, 3);
 const base = import.meta.env.BASE_URL;
+
+function pad(n: number) {
+	return n.toString().padStart(2, '0');
+}
+function year(date: Date) {
+	return date.getFullYear();
+}
+function monthShort(date: Date) {
+	return date.toLocaleString('en-US', { month: 'short' });
+}
 ---
 
 <!doctype html>
@@ -19,57 +28,154 @@ const base = import.meta.env.BASE_URL;
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
 			main {
-				width: 720px;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 3em 2em 6em;
 			}
+
 			.hero {
-				padding: 2em 0 1em;
+				padding: 3em 0 4em;
 			}
 			.hero h1 {
-				margin-bottom: 0.25rem;
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: clamp(3rem, 8vw, 5.5rem);
+				line-height: 0.95;
+				margin: 0 0 1.5rem;
+				letter-spacing: -0.02em;
+			}
+			.hero h1 em {
+				font-style: italic;
+				color: var(--accent);
 			}
 			.hero p {
+				max-width: 560px;
 				color: rgb(var(--gray));
-				margin-bottom: 0;
+				line-height: 1.7;
+				margin: 0;
 			}
-			.section-title {
-				margin-top: 2.5em;
-				font-size: 1.5rem;
-			}
-			.post-list {
+
+			.list {
 				list-style: none;
 				margin: 0;
 				padding: 0;
 			}
-			.post-list li {
-				padding: 0.75em 0;
+			.item {
+				display: grid;
+				grid-template-columns: 64px 1fr 160px 60px;
+				align-items: center;
+				gap: 2rem;
+				padding: 1.5rem 0;
+				border-top: 1px solid rgb(var(--gray-light));
+				position: relative;
+				text-decoration: none;
+				color: inherit;
+				transition: padding 250ms ease;
+			}
+			.item:last-child {
 				border-bottom: 1px solid rgb(var(--gray-light));
 			}
-			.post-list li:last-child {
-				border-bottom: none;
-			}
-			.post-list a {
-				text-decoration: none;
-				display: flex;
-				justify-content: space-between;
-				align-items: baseline;
-				gap: 1em;
-			}
-			.post-list h3 {
-				margin: 0;
-				font-size: 1.25rem;
-			}
-			.post-list .date {
-				margin: 0;
+
+			.num {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 0.95rem;
 				color: rgb(var(--gray));
-				font-size: 0.9rem;
-				white-space: nowrap;
+				letter-spacing: 0.05em;
 			}
-			.post-list a:hover h3 {
+
+			.title {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: clamp(2rem, 4.5vw, 3.25rem);
+				font-weight: 600;
+				line-height: 1;
+				margin: 0;
+				color: rgb(var(--black));
+				letter-spacing: -0.01em;
+				transition: transform 250ms ease, color 250ms ease;
+			}
+			.item:hover .title {
+				transform: translateX(8px);
 				color: var(--accent);
 			}
-			.more {
-				margin-top: 1.5em;
-				display: inline-block;
+
+			.meta {
+				font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+				font-size: 0.75rem;
+				letter-spacing: 0.1em;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				white-space: nowrap;
+				text-align: right;
+			}
+
+			.thumb {
+				width: 100%;
+				aspect-ratio: 1 / 1;
+				background: linear-gradient(
+					135deg,
+					rgb(var(--gray-light)) 0%,
+					#d8dde8 100%
+				);
+				border-radius: 4px;
+				position: relative;
+				overflow: hidden;
+				transition: transform 250ms ease;
+			}
+			.item:hover .thumb {
+				transform: scale(1.05);
+			}
+			.thumb::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				background: linear-gradient(
+					45deg,
+					transparent 48%,
+					rgba(255, 255, 255, 0.4) 50%,
+					transparent 52%
+				);
+			}
+
+			.arrow {
+				font-size: 1.5rem;
+				color: rgb(var(--black));
+				justify-self: end;
+				transition: transform 250ms ease;
+			}
+			.item:hover .arrow {
+				transform: translateX(8px);
+			}
+
+			.footer-link {
+				margin-top: 3em;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.75rem;
+				text-decoration: none;
+				color: rgb(var(--black));
+				font-weight: 600;
+				border-bottom: 1px solid rgb(var(--black));
+				padding-bottom: 0.25em;
+			}
+			.footer-link:hover {
+				color: var(--accent);
+				border-color: var(--accent);
+			}
+
+			@media (max-width: 720px) {
+				main {
+					padding: 2em 1.25em 4em;
+				}
+				.item {
+					grid-template-columns: 36px 1fr 40px;
+					gap: 0.75rem;
+				}
+				.thumb,
+				.meta {
+					display: none;
+				}
+				.title {
+					font-size: clamp(1.5rem, 7vw, 2rem);
+				}
 			}
 		</style>
 	</head>
@@ -77,27 +183,33 @@ const base = import.meta.env.BASE_URL;
 		<Header />
 		<main>
 			<section class="hero">
-				<h1>你好，我是 yihujiua 👋</h1>
-				<p>这里记录我的折腾笔记：智能家居、嵌入式开发、AI 与开源工具。</p>
+				<h1>我的<em>折腾</em>笔记</h1>
+				<p>
+					一个爱折腾的开发者，记录在智能家居、嵌入式开发、AI 与开源工具上的实践。
+				</p>
 			</section>
 
-			<h2 class="section-title">最新文章</h2>
-			<ul class="post-list">
+			<ul class="list">
 				{
-					recentPosts.map((post) => (
+					posts.map((post, i) => (
 						<li>
-							<a href={`${base}blog/${post.id}/`}>
-								<h3>{post.data.title}</h3>
-								<p class="date">
-									<FormattedDate date={post.data.pubDate} />
-								</p>
+							<a class="item" href={`${base}blog/${post.id}/`}>
+								<span class="num">{pad(i + 1)}</span>
+								<h2 class="title">{post.data.title}</h2>
+								<span class="meta">
+									Blog — {monthShort(post.data.pubDate)} {year(post.data.pubDate)}
+								</span>
+								<span class="thumb" aria-hidden="true" />
+								<span class="arrow" aria-hidden="true">→</span>
 							</a>
 						</li>
 					))
 				}
 			</ul>
 
-			<a class="more" href={`${base}blog/`}>查看全部文章 →</a>
+			<a class="footer-link" href={`${base}blog/`}>
+				查看全部文章 →
+			</a>
 		</main>
 		<Footer />
 	</body>
