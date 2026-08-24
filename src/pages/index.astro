@@ -1,11 +1,8 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const base = import.meta.env.BASE_URL;
-const total = Object.keys(import.meta.glob('/src/content/blog/*.md')).length;
 ---
 
 <!doctype html>
@@ -13,118 +10,255 @@ const total = Object.keys(import.meta.glob('/src/content/blog/*.md')).length;
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			main {
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 5em 1.5em 6em;
+			html, body {
+				background: #f5efe1;
+				background-image:
+					radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+					radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+				background-size: 3px 3px, 7px 7px;
+				background-position: 0 0, 1.5px 1.5px;
 			}
 
-			.hero {
-				padding: 0 0 2.5em;
-				border-bottom: 1px solid rgb(var(--gray-light));
-			}
-			.hero h1 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: clamp(2.25rem, 5vw, 3.5rem);
-				line-height: 1;
-				margin: 0 0 1.25rem;
-				letter-spacing: -0.02em;
-			}
-			.hero h1 em {
-				font-style: italic;
-				color: var(--accent);
-			}
-			.hero p {
-				max-width: 560px;
-				color: rgb(var(--gray));
-				line-height: 1.7;
-				margin: 0 0 1.75rem;
+			.page {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 5rem 1.5rem;
+				text-align: center;
+				max-width: 100%;
 			}
 
-			.cta {
+			/* ── top eyebrow ── */
+			.eyebrow {
 				display: inline-flex;
 				align-items: center;
-				gap: 0.5rem;
-				padding: 0.7em 1.4em;
-				background: rgb(var(--black));
-				color: white;
-				text-decoration: none;
-				border-radius: 6px;
-				font-weight: 600;
-				font-size: 0.95rem;
-				transition: background 200ms ease, transform 200ms ease;
+				gap: 0.85rem;
+				margin-bottom: 3rem;
+				color: rgb(var(--gray));
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 0.82rem;
+				letter-spacing: 0.18em;
+				text-transform: uppercase;
 			}
-			.cta:hover {
-				background: var(--accent);
-				transform: translateY(-1px);
+			.eyebrow .squiggle {
+				color: rgb(var(--black));
+				opacity: 0.55;
+			}
+			.eyebrow .zh {
+				font-family: 'Kalam', 'Comic Sans MS', 'Marker Felt', cursive;
+				font-style: italic;
+				font-size: 0.9rem;
+				letter-spacing: 0.12em;
+				color: rgb(var(--black));
+				text-transform: none;
 			}
 
-			.stats {
-				display: flex;
-				gap: 2.5rem;
-				margin-top: 3em;
-				padding-top: 2em;
-				border-top: 1px solid rgb(var(--gray-light));
+			/* ── main title ── */
+			.title {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-weight: 700;
+				font-style: italic;
+				font-size: clamp(3.25rem, 9vw, 6rem);
+				line-height: 1;
+				color: rgb(var(--black));
+				letter-spacing: -0.02em;
+				margin: 0 0 0.4em;
+				max-width: 16ch;
 			}
+			.title .underline {
+				position: relative;
+				display: inline-block;
+			}
+			.title .underline::after {
+				content: '';
+				position: absolute;
+				left: 8%;
+				right: 8%;
+				bottom: -0.08em;
+				height: 0.18em;
+				background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M0 8 Q 25 0, 50 8 T 100 8 T 150 8 T 200 8' fill='none' stroke='%23e63946' stroke-width='3' stroke-linecap='round'/></svg>") no-repeat center / 100% 100%;
+			}
+
+			/* ── subtitle ── */
+			.subtitle {
+				max-width: 56ch;
+				margin: 0 auto 2.5rem;
+				color: rgb(var(--gray));
+				font-size: 1rem;
+				line-height: 1.65;
+			}
+
+			/* ── divider squiggle ── */
+			.divider {
+				margin: 0 auto 2.5rem;
+				width: 80px;
+				opacity: 0.45;
+			}
+
+			/* ── buttons ── */
+			.cta-row {
+				display: flex;
+				gap: 1rem;
+				justify-content: center;
+				flex-wrap: wrap;
+				margin-bottom: 4rem;
+			}
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.85em 1.6em;
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-style: italic;
+				font-size: 1rem;
+				font-weight: 600;
+				text-decoration: none;
+				border-radius: 4px;
+				cursor: pointer;
+				transition: all 220ms ease;
+				min-width: 180px;
+			}
+			.btn-primary {
+				background: rgb(var(--black));
+				color: white;
+				border: 1.5px solid rgb(var(--black));
+			}
+			.btn-primary:hover {
+				background: transparent;
+				color: rgb(var(--black));
+				transform: translateY(-2px);
+			}
+			.btn-ghost {
+				background: transparent;
+				color: rgb(var(--black));
+				border: 1.5px dashed rgb(var(--black));
+			}
+			.btn-ghost:hover {
+				background: rgb(var(--black));
+				color: white;
+				transform: translateY(-2px);
+			}
+
+			/* ── stats card with corner stars ── */
+			.stats {
+				position: relative;
+				background: rgba(255, 255, 255, 0.55);
+				border: 1.5px dashed rgb(var(--black));
+				padding: 1.75rem 3rem;
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 3rem;
+				max-width: 640px;
+				width: 100%;
+			}
+			.stats::before,
+			.stats::after {
+				content: '✱';
+				position: absolute;
+				font-size: 1.1rem;
+				color: rgb(var(--black));
+			}
+			.stats::before { top: -0.55rem; left: -0.55rem; }
+			.stats::after  { top: -0.55rem; right: -0.55rem; }
+			.stats .corner-bl,
+			.stats .corner-br {
+				position: absolute;
+				bottom: -0.55rem;
+				font-size: 1.1rem;
+				color: rgb(var(--black));
+			}
+			.stats .corner-bl { left: -0.55rem; }
+			.stats .corner-br { right: -0.55rem; }
+
 			.stat {
 				display: flex;
 				flex-direction: column;
-				gap: 0.25rem;
+				align-items: center;
+				gap: 0.35rem;
 			}
 			.stat-num {
 				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.75rem;
+				font-style: italic;
 				font-weight: 700;
-				color: rgb(var(--black));
+				font-size: 2.5rem;
 				line-height: 1;
 			}
+			.stat-num.c1 { color: #e63946; }
+			.stat-num.c2 { color: #2a6f97; }
+			.stat-num.c3 { color: #2d8659; }
 			.stat-label {
-				font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-				font-size: 0.7rem;
-				letter-spacing: 0.1em;
-				text-transform: uppercase;
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-style: italic;
+				font-size: 0.85rem;
 				color: rgb(var(--gray));
 			}
 
-			@media (max-width: 720px) {
-				main {
-					padding: 3em 1.25em 4em;
-				}
+			@media (max-width: 600px) {
+				.page { padding: 3rem 1.25rem; }
+				.eyebrow { margin-bottom: 2rem; }
+				.title { font-size: clamp(2.5rem, 11vw, 4rem); }
 				.stats {
-					gap: 1.5rem;
+					grid-template-columns: 1fr;
+					gap: 1.25rem;
+					padding: 1.5rem 2rem;
 				}
 			}
 		</style>
 	</head>
 	<body>
-		<Header />
-		<main>
-			<section class="hero">
-				<h1>我的<em>折腾</em>笔记</h1>
-				<p>
-					一个爱折腾的开发者，记录在智能家居、嵌入式开发、AI 与开源工具上的实践。
-					把踩过的坑、跑通的方案、写过的代码都摊在这里。
-				</p>
-				<a class="cta" href={`${base}blog/`}>
-					浏览全部 {total} 篇文章 →
-				</a>
-			</section>
+		<section class="page">
+			<div class="eyebrow">
+				<span class="squiggle" aria-hidden="true">
+					<svg viewBox="0 0 50 10" width="42" height="10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+						<path d="M2 5 Q 10 0, 18 5 T 34 5 T 48 5" />
+					</svg>
+				</span>
+				<span class="zh">手绘风</span>
+				<span>— SKETCH STYLE —</span>
+				<span class="squiggle" aria-hidden="true">
+					<svg viewBox="0 0 50 10" width="42" height="10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+						<path d="M2 5 Q 10 0, 18 5 T 34 5 T 48 5" />
+					</svg>
+				</span>
+			</div>
 
-			<section class="stats">
-				<div class="stat">
-					<span class="stat-num">{total}</span>
-					<span class="stat-label">Articles</span>
+			<h1 class="title">
+				Every<br />line<br />
+				<span class="underline">tells a story</span>
+			</h1>
+
+			<p class="subtitle">
+				手绘风的边框、纸张的肌理、笔迹的温度。不完美的线条，<br />
+				却承载着想被你看见的那点心意。
+			</p>
+
+			<svg class="divider" viewBox="0 0 80 12" fill="none" stroke="#1f2235" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+				<path d="M2 6 Q 12 0, 22 6 T 42 6 T 62 6 T 78 6" />
+			</svg>
+
+			<div class="cta-row">
+				<a class="btn btn-primary" href={`${base}blog/`}>Open Sketchbook</a>
+				<a class="btn btn-ghost" href={`${base}about/`}>View the Rules</a>
+			</div>
+
+			<div class="stats" role="list">
+				<span class="corner-bl" aria-hidden="true">✱</span>
+				<span class="corner-br" aria-hidden="true">✱</span>
+				<div class="stat" role="listitem">
+					<span class="stat-num c1">3</span>
+					<span class="stat-label">篇 笔记</span>
 				</div>
-				<div class="stat">
-					<span class="stat-num">3</span>
-					<span class="stat-label">Topics</span>
+				<div class="stat" role="listitem">
+					<span class="stat-num c2">3</span>
+					<span class="stat-label">个 主题</span>
 				</div>
-				<div class="stat">
-					<span class="stat-num">2026</span>
-					<span class="stat-label">Started</span>
+				<div class="stat" role="listitem">
+					<span class="stat-num c3">∞</span>
+					<span class="stat-label">折腾 进行中</span>
 				</div>
-			</section>
-		</main>
-		<Footer />
+			</div>
+		</section>
 	</body>
 </html>
