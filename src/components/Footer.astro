@@ -20,12 +20,12 @@ const base = import.meta.env.BASE_URL;
 					<br />手绘风，保留一点不完美的温度。
 				</p>
 				<div class="palette" aria-label="主题色">
-					<span class="swatch" style="background:#111" title="Pencil Gray"></span>
-					<span class="swatch" style="background:#f4ecd8" title="Paper Cream"></span>
-					<span class="swatch" style="background:#e63946" title="Sketch Red"></span>
-					<span class="swatch" style="background:#2a6f97" title="Ink Blue"></span>
-					<span class="swatch" style="background:#52b788" title="Leaf Green"></span>
-					<span class="swatch" style="background:#f4a261" title="Warm Orange"></span>
+					<span class="swatch" style="background:#2A2A2A" title="Pencil #2A2A2A"></span>
+					<span class="swatch" style="background:#F5EFE1" title="Paper #F5EFE1"></span>
+					<span class="swatch" style="background:#e63946" title="Marker #e63946"></span>
+					<span class="swatch" style="background:#2337ff" title="Accent #2337ff"></span>
+					<span class="swatch" style="background:#2A6F97" title="Ink #2A6F97"></span>
+					<span class="swatch" style="background:#2D8659" title="Leaf #2D8659"></span>
 				</div>
 			</div>
 
@@ -78,13 +78,10 @@ const base = import.meta.env.BASE_URL;
 	footer {
 		margin-top: 4em;
 		padding: 3em 1.5em 2em;
-		background: linear-gradient(
-			180deg,
-			rgb(var(--gray-light)) 0%,
-			rgba(var(--gray-light), 0.4) 100%
-		);
+		background: white;
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
 		color: rgb(var(--gray-dark));
-		font-family: 'Kalam', 'Comic Sans MS', 'Marker Felt', cursive, ui-serif, Georgia, serif;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 	}
 
 	.footer-inner {
@@ -113,15 +110,14 @@ const base = import.meta.env.BASE_URL;
 		justify-content: center;
 		width: 32px;
 		height: 32px;
-		border: 1.5px dashed currentColor;
+		border: 1.5px solid rgb(var(--black));
 		border-radius: 4px;
 		color: rgb(var(--black));
 	}
 	.brand-title {
-		font-family: ui-serif, Georgia, 'Times New Roman', serif;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 1.4rem;
 		font-weight: 700;
-		font-style: italic;
 		margin: 0;
 		color: rgb(var(--black));
 		letter-spacing: -0.01em;
@@ -130,7 +126,7 @@ const base = import.meta.env.BASE_URL;
 		max-width: 360px;
 		font-size: 0.92rem;
 		line-height: 1.65;
-		color: rgb(var(--gray-dark));
+		color: rgb(var(--gray));
 		margin: 0 0 1.25rem;
 	}
 	.palette {
@@ -141,9 +137,9 @@ const base = import.meta.env.BASE_URL;
 	.swatch {
 		width: 22px;
 		height: 22px;
-		border: 1.5px solid rgb(var(--gray));
-		border-radius: 3px;
-		box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.08);
+		border: 1px solid rgba(0, 0, 0, 0.12);
+		border-radius: 50%;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 	}
 
 	/* Column lists */
@@ -153,46 +149,31 @@ const base = import.meta.env.BASE_URL;
 		gap: 2rem;
 	}
 	.col-title {
-		font-family: ui-serif, Georgia, serif;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 0.78rem;
 		font-weight: 700;
-		letter-spacing: 0.12em;
+		letter-spacing: 0.22em;
 		text-transform: uppercase;
 		margin: 0 0 0.9rem;
-		color: rgb(var(--black));
+		color: var(--accent);
 	}
 	.col a {
 		display: block;
-		font-family: ui-serif, Georgia, serif;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 0.92rem;
-		font-style: italic;
-		text-decoration: underline;
-		text-decoration-style: wavy;
-		text-underline-offset: 4px;
-		text-decoration-color: rgba(var(--gray), 0.4);
+		text-decoration: none;
 		color: rgb(var(--gray-dark));
 		padding: 0.18rem 0;
 		transition: color 200ms ease;
 	}
 	.col a:hover {
-		color: rgb(var(--black));
-		text-decoration-color: rgb(var(--accent));
+		color: var(--accent);
 	}
 
 	/* ── Divider ── */
 	.divider {
 		margin: 2.5rem 0 1.5rem;
-		border-top: 1.5px dashed rgba(var(--gray), 0.5);
-		position: relative;
-	}
-	.divider::before {
-		content: '';
-		position: absolute;
-		top: -3px;
-		left: 0;
-		width: 16px;
-		height: 6px;
-		background: rgb(var(--gray-light));
+		border-top: 1px solid rgba(0, 0, 0, 0.08);
 	}
 
 	/* ── Bottom: signature + back button ── */
@@ -207,13 +188,12 @@ const base = import.meta.env.BASE_URL;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
-		font-family: ui-serif, Georgia, serif;
-		font-style: italic;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 0.95rem;
 		color: rgb(var(--gray));
 	}
 	.star {
-		color: rgb(var(--accent));
+		color: #e63946;
 		font-size: 0.85rem;
 	}
 	.sig-name {
@@ -229,26 +209,27 @@ const base = import.meta.env.BASE_URL;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		font-family: ui-serif, Georgia, serif;
-		font-style: italic;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 0.92rem;
+		font-weight: 600;
 		text-decoration: none;
 		color: rgb(var(--black));
 		padding: 0.55rem 1.1rem;
-		border: 1.5px dashed rgb(var(--gray));
+		border: 1.5px solid rgb(var(--black));
 		border-radius: 6px;
-		background: rgba(255, 255, 255, 0.5);
+		background: white;
 		transition: all 200ms ease;
 	}
 	.back-btn:hover {
-		border-color: rgb(var(--accent));
-		color: rgb(var(--accent));
+		background: var(--accent);
+		border-color: var(--accent);
+		color: white;
 		transform: translateY(-1px);
 	}
 
 	.copy {
 		text-align: center;
-		font-family: ui-serif, Georgia, serif;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 0.78rem;
 		color: rgb(var(--gray));
 		margin: 1.5rem 0 0;
