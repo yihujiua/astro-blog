@@ -123,19 +123,18 @@ const base = import.meta.env.BASE_URL;
 				transition: transform 200ms ease;
 			}
 			.swatch-card:hover { transform: translateY(-2px); }
-			.swatch-card::before,
-			.swatch-card::after {
+			.swatch-card::before {
 				content: '';
 				position: absolute;
 				top: -4px;
+				left: 50%;
+				transform: translateX(-50%);
 				width: 8px;
 				height: 8px;
 				border-radius: 50%;
 				background: rgb(var(--gray-light));
 				border: 1px solid rgb(var(--gray));
 			}
-			.swatch-card::before { left: 10px; }
-			.swatch-card::after { right: 10px; }
 			.swatch {
 				width: 56px;
 				height: 56px;
