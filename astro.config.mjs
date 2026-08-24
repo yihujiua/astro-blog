@@ -9,7 +9,7 @@ import { defineConfig, fontProviders } from 'astro/config';
 //   site  = https://<你的GitHub用户名>.github.io
 //   base  = /<你的仓库名>/   （仓库名就是 GitHub 上那个项目名）
 export default defineConfig({
-	site: 'https://你的用户名.github.io',
+	site: 'https://yihujiua.github.io',
 	base: '/astro-blog/',
 	integrations: [mdx(), sitemap()],
 	fonts: [
