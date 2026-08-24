@@ -356,28 +356,6 @@ const events: TimelineEvent[] = [
 				}
 			</section>
 
-			<div class="legend" aria-label="图例">
-				<div class="legend-item">
-					<span class="legend-line" /> Central spine (2px)
-				</div>
-				<div class="legend-item">
-					<span class="legend-node" /> Circular node
-				</div>
-				<div class="legend-item">
-					<span class="legend-card" /> Content card
-				</div>
-				<div class="legend-cats">
-					{
-						Object.entries(catMeta).map(([key, meta]) => (
-							<span class="cat" style={`color: ${meta.color};`}>
-								<span class="dot" style={`background: ${meta.color};`} />
-								{meta.label}
-							</span>
-						))
-					}
-				</div>
-			</div>
-
 			<section class="contact">
 				<p><strong>联系我 →</strong></p>
 				<p>
