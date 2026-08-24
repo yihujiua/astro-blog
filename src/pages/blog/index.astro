@@ -72,9 +72,10 @@ function fmtDate(d: string) {
 		<BaseHead title={`博客 — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
 			:root {
-				--blog-accent: #16a34a;
-				--blog-border: #e5e7eb;
-				--blog-muted: #6b7280;
+				--blog-accent: var(--accent);
+				--blog-red: #e63946;
+				--blog-border: rgba(0, 0, 0, 0.08);
+				--blog-muted: rgb(var(--gray));
 			}
 
 			main {
@@ -114,14 +115,16 @@ function fmtDate(d: string) {
 			.read-hint {
 				grid-column: 2;
 				grid-row: 1 / span 2;
-				background: var(--blog-border);
-				color: var(--blog-muted);
+				background: rgb(var(--black));
+				color: white;
 				font-size: 0.78rem;
 				padding: 0.4rem 0.9rem;
 				border-radius: 999px;
 				justify-self: end;
 				align-self: center;
 				white-space: nowrap;
+				font-weight: 600;
+				letter-spacing: 0.02em;
 			}
 
 			/* ── featured ── */
@@ -132,19 +135,23 @@ function fmtDate(d: string) {
 				margin-bottom: 1.5em;
 			}
 			.featured-label {
-				color: var(--blog-accent);
-				font-size: 0.85rem;
-				font-weight: 600;
+				color: var(--blog-red);
+				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-size: 0.78rem;
+				font-weight: 700;
+				text-transform: uppercase;
+				letter-spacing: 0.22em;
 				display: inline-block;
-				margin-bottom: 0.5rem;
+				margin-bottom: 0.6rem;
 			}
 			.featured-title {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
 				font-size: clamp(1.85rem, 4vw, 2.5rem);
 				line-height: 1.15;
 				margin: 0 0 0.75rem;
-				color: var(--blog-accent);
+				color: rgb(var(--black));
 				letter-spacing: -0.01em;
+				font-weight: 700;
 			}
 			.featured-desc {
 				color: rgb(var(--gray));
@@ -175,7 +182,7 @@ function fmtDate(d: string) {
 				width: 1.5rem;
 				height: 1.5rem;
 				border-radius: 50%;
-				background: linear-gradient(135deg, #6366f1, #8b5cf6);
+				background: var(--blog-red);
 				color: white;
 				display: inline-flex;
 				align-items: center;
@@ -237,12 +244,13 @@ function fmtDate(d: string) {
 				color: rgb(var(--gray));
 			}
 			.card-tag {
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
+				background: rgba(35, 55, 255, 0.1);
+				color: var(--blog-accent);
 				padding: 0.2rem 0.6rem;
 				border-radius: 4px;
-				font-weight: 600;
+				font-weight: 700;
 				font-size: 0.7rem;
+				letter-spacing: 0.02em;
 			}
 			.card-read { white-space: nowrap; }
 			.card-title {
@@ -294,6 +302,12 @@ function fmtDate(d: string) {
 				border-radius: 4px;
 				border: 1px solid var(--blog-accent);
 				color: var(--blog-accent);
+				background: white;
+				transition: background 200ms ease, color 200ms ease;
+			}
+			.chip:hover {
+				background: var(--blog-accent);
+				color: white;
 			}
 
 			/* ── modal (unchanged) ── */
@@ -363,8 +377,8 @@ function fmtDate(d: string) {
 				color: rgb(var(--gray-dark));
 			}
 			.tag.active {
-				background: #d1fadf;
-				color: #027a48;
+				background: rgba(230, 57, 70, 0.12);
+				color: var(--blog-red);
 			}
 			.modal h2 {
 				font-family: ui-serif, Georgia, 'Times New Roman', serif;
@@ -441,11 +455,11 @@ function fmtDate(d: string) {
 			}
 			.back:hover { color: var(--accent); }
 			.chip.alt {
-				border-color: #2563eb;
-				color: #2563eb;
+				border-color: var(--blog-red);
+				color: var(--blog-red);
 			}
 			.chip.alt:hover {
-				background: #2563eb;
+				background: var(--blog-red);
 				color: white;
 			}
 
