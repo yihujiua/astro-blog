@@ -10,15 +10,6 @@ const base = import.meta.env.BASE_URL;
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			html, body {
-				background: #f5efe1;
-				background-image:
-					radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
-					radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-				background-size: 3px 3px, 7px 7px;
-				background-position: 0 0, 1.5px 1.5px;
-			}
-
 			.page {
 				min-height: 100vh;
 				display: flex;
@@ -34,106 +25,97 @@ const base = import.meta.env.BASE_URL;
 			.eyebrow {
 				display: inline-flex;
 				align-items: center;
-				gap: 0.85rem;
+				gap: 0.75rem;
 				margin-bottom: 3rem;
 				color: rgb(var(--gray));
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 0.82rem;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-size: 0.78rem;
 				letter-spacing: 0.18em;
 				text-transform: uppercase;
 			}
-			.eyebrow .squiggle {
-				color: rgb(var(--black));
-				opacity: 0.55;
+			.eyebrow .dot {
+				width: 4px;
+				height: 4px;
+				border-radius: 50%;
+				background: rgb(var(--gray));
+				display: inline-block;
 			}
-			.eyebrow .zh {
-				font-family: 'Kalam', 'Comic Sans MS', 'Marker Felt', cursive;
-				font-style: italic;
-				font-size: 0.9rem;
-				letter-spacing: 0.12em;
+			.eyebrow .accent {
 				color: rgb(var(--black));
-				text-transform: none;
+				font-weight: 700;
 			}
 
 			/* ── main title ── */
 			.title {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
 				font-weight: 700;
-				font-style: italic;
-				font-size: clamp(3.25rem, 9vw, 6rem);
+				font-size: clamp(3rem, 9vw, 6rem);
 				line-height: 1;
 				color: rgb(var(--black));
-				letter-spacing: -0.02em;
-				margin: 0 0 0.4em;
-				max-width: 16ch;
+				letter-spacing: -0.03em;
+				margin: 0 0 0.5em;
+				max-width: 18ch;
 			}
-			.title .underline {
-				position: relative;
-				display: inline-block;
-			}
-			.title .underline::after {
-				content: '';
-				position: absolute;
-				left: 8%;
-				right: 8%;
-				bottom: -0.08em;
-				height: 0.18em;
-				background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 16' preserveAspectRatio='none'><path d='M0 8 Q 25 0, 50 8 T 100 8 T 150 8 T 200 8' fill='none' stroke='%23e63946' stroke-width='3' stroke-linecap='round'/></svg>") no-repeat center / 100% 100%;
+			.title .em {
+				font-style: italic;
+				color: var(--accent);
 			}
 
 			/* ── subtitle ── */
 			.subtitle {
-				max-width: 56ch;
-				margin: 0 auto 2.5rem;
+				max-width: 52ch;
+				margin: 0 auto 3rem;
 				color: rgb(var(--gray));
-				font-size: 1rem;
+				font-size: 1.05rem;
 				line-height: 1.65;
 			}
 
-			/* ── divider squiggle ── */
+			/* ── divider ── */
 			.divider {
-				margin: 0 auto 2.5rem;
-				width: 80px;
-				opacity: 0.45;
+				margin: 0 auto 3rem;
+				width: 48px;
+				height: 2px;
+				background: rgb(var(--gray-light));
 			}
 
 			/* ── buttons ── */
 			.cta-row {
 				display: flex;
-				gap: 1rem;
+				gap: 0.85rem;
 				justify-content: center;
 				flex-wrap: wrap;
-				margin-bottom: 4rem;
+				margin-bottom: 4.5rem;
 			}
 			.btn {
 				display: inline-flex;
 				align-items: center;
 				justify-content: center;
-				padding: 0.85em 1.6em;
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-style: italic;
-				font-size: 1rem;
+				padding: 0.9em 1.8em;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-size: 0.95rem;
 				font-weight: 600;
 				text-decoration: none;
-				border-radius: 4px;
+				border-radius: 6px;
 				cursor: pointer;
 				transition: all 220ms ease;
-				min-width: 180px;
+				min-width: 170px;
+				border: 1.5px solid;
 			}
 			.btn-primary {
 				background: rgb(var(--black));
 				color: white;
-				border: 1.5px solid rgb(var(--black));
+				border-color: rgb(var(--black));
 			}
 			.btn-primary:hover {
-				background: transparent;
-				color: rgb(var(--black));
+				background: var(--accent);
+				border-color: var(--accent);
+				color: white;
 				transform: translateY(-2px);
 			}
 			.btn-ghost {
 				background: transparent;
 				color: rgb(var(--black));
-				border: 1.5px dashed rgb(var(--black));
+				border-color: rgb(var(--black));
 			}
 			.btn-ghost:hover {
 				background: rgb(var(--black));
@@ -141,37 +123,18 @@ const base = import.meta.env.BASE_URL;
 				transform: translateY(-2px);
 			}
 
-			/* ── stats card with corner stars ── */
+			/* ── stats card ── */
 			.stats {
-				position: relative;
-				background: rgba(255, 255, 255, 0.55);
-				border: 1.5px dashed rgb(var(--black));
+				border: 1px solid rgb(var(--gray-light));
+				background: white;
 				padding: 1.75rem 3rem;
 				display: grid;
 				grid-template-columns: repeat(3, 1fr);
 				gap: 3rem;
 				max-width: 640px;
 				width: 100%;
+				box-shadow: 0 2px 6px rgba(var(--gray), 6%);
 			}
-			.stats::before,
-			.stats::after {
-				content: '✱';
-				position: absolute;
-				font-size: 1.1rem;
-				color: rgb(var(--black));
-			}
-			.stats::before { top: -0.55rem; left: -0.55rem; }
-			.stats::after  { top: -0.55rem; right: -0.55rem; }
-			.stats .corner-bl,
-			.stats .corner-br {
-				position: absolute;
-				bottom: -0.55rem;
-				font-size: 1.1rem;
-				color: rgb(var(--black));
-			}
-			.stats .corner-bl { left: -0.55rem; }
-			.stats .corner-br { right: -0.55rem; }
-
 			.stat {
 				display: flex;
 				flex-direction: column;
@@ -179,19 +142,18 @@ const base = import.meta.env.BASE_URL;
 				gap: 0.35rem;
 			}
 			.stat-num {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-style: italic;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
 				font-weight: 700;
-				font-size: 2.5rem;
+				font-size: 2.25rem;
 				line-height: 1;
+				color: rgb(var(--black));
+				letter-spacing: -0.02em;
 			}
-			.stat-num.c1 { color: #e63946; }
-			.stat-num.c2 { color: #2a6f97; }
-			.stat-num.c3 { color: #2d8659; }
 			.stat-label {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-style: italic;
-				font-size: 0.85rem;
+				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-size: 0.78rem;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
 				color: rgb(var(--gray));
 			}
 
@@ -210,23 +172,16 @@ const base = import.meta.env.BASE_URL;
 	<body>
 		<section class="page">
 			<div class="eyebrow">
-				<span class="squiggle" aria-hidden="true">
-					<svg viewBox="0 0 50 10" width="42" height="10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-						<path d="M2 5 Q 10 0, 18 5 T 34 5 T 48 5" />
-					</svg>
-				</span>
-				<span class="zh">手绘风</span>
-				<span>— SKETCH STYLE —</span>
-				<span class="squiggle" aria-hidden="true">
-					<svg viewBox="0 0 50 10" width="42" height="10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-						<path d="M2 5 Q 10 0, 18 5 T 34 5 T 48 5" />
-					</svg>
-				</span>
+				<span class="dot" aria-hidden="true"></span>
+				<span class="accent">Sketches</span>
+				<span class="dot" aria-hidden="true"></span>
+				<span>Notes on Building</span>
+				<span class="dot" aria-hidden="true"></span>
 			</div>
 
 			<h1 class="title">
-				Every<br />line<br />
-				<span class="underline">tells a story</span>
+				Every line<br />
+				tells a <span class="em">story</span>.
 			</h1>
 
 			<p class="subtitle">
@@ -234,9 +189,7 @@ const base = import.meta.env.BASE_URL;
 				却承载着想被你看见的那点心意。
 			</p>
 
-			<svg class="divider" viewBox="0 0 80 12" fill="none" stroke="#1f2235" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
-				<path d="M2 6 Q 12 0, 22 6 T 42 6 T 62 6 T 78 6" />
-			</svg>
+			<div class="divider" aria-hidden="true"></div>
 
 			<div class="cta-row">
 				<a class="btn btn-primary" href={`${base}blog/`}>Open Sketchbook</a>
@@ -244,19 +197,17 @@ const base = import.meta.env.BASE_URL;
 			</div>
 
 			<div class="stats" role="list">
-				<span class="corner-bl" aria-hidden="true">✱</span>
-				<span class="corner-br" aria-hidden="true">✱</span>
 				<div class="stat" role="listitem">
-					<span class="stat-num c1">3</span>
-					<span class="stat-label">篇 笔记</span>
+					<span class="stat-num">3</span>
+					<span class="stat-label">Articles</span>
 				</div>
 				<div class="stat" role="listitem">
-					<span class="stat-num c2">3</span>
-					<span class="stat-label">个 主题</span>
+					<span class="stat-num">3</span>
+					<span class="stat-label">Topics</span>
 				</div>
 				<div class="stat" role="listitem">
-					<span class="stat-num c3">∞</span>
-					<span class="stat-label">折腾 进行中</span>
+					<span class="stat-num">∞</span>
+					<span class="stat-label">In Progress</span>
 				</div>
 			</div>
 		</section>
