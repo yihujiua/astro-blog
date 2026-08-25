@@ -66,6 +66,15 @@ const related: RelatedPost[] = Astro.props.related ?? [];
 const { title, description, pubDate, tags, html, slug } = post;
 const base = import.meta.env.BASE_URL;
 
+// Keep date format in sync with the blog list page (e.g. "Aug 25, 2026")
+function fmtDate(d: string) {
+	return new Date(d).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+	});
+}
+
 // Inject sequential ids into <h2>/<h3> and build the TOC list
 const toc: TocItem[] = [];
 const rawHtml = html.replace(/<h([23])\s+id="([^"]+)">([\s\S]*?)<\/h\1>/g, (_m, lvl, id, inner) => {
@@ -350,7 +359,7 @@ const rawHtml = html.replace(/<h([23])\s+id="([^"]+)">([\s\S]*?)<\/h\1>/g, (_m, 
 					}
 
 					<h1>{title}</h1>
-					<time>{pubDate}</time>
+					<time datetime={pubDate}>{fmtDate(pubDate)}</time>
 
 					<article class="prose" set:html={rawHtml} />
 
