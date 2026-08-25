@@ -16,7 +16,6 @@ interface PostData {
 	pubDate: string;
 	tags: string[];
 	body: string;
-	html: string;
 	readMinutes: number;
 	thumb: string;
 	thumbLabel: string;
@@ -29,14 +28,12 @@ function thumbColor(seed: string): string {
 	return PALETTE[Math.abs(h) % PALETTE.length];
 }
 
-const data: PostData[] = (await Promise.all(
-	Object.entries(modules).map(async ([path, mod]) => {
+const data: PostData[] = Object.entries(modules)
+	.map(([path, mod]) => {
 		const rawFm = (mod as any).frontmatter;
 		const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
 		const slug = path.split('/').pop()!.replace(/\.md$/, '');
 		const raw: string = (typeof (mod as any).rawContent === 'function' ? (mod as any).rawContent() : (mod as any).rawContent) ?? '';
-		const cc = (mod as any).compiledContent;
-		const html: string = (typeof cc === 'function' ? await cc() : cc) ?? '';
 		const stripped = raw
 			.replace(/```[\s\S]*?```/g, ' ')
 			.replace(/`[^`]*`/g, ' ')
@@ -55,13 +52,12 @@ const data: PostData[] = (await Promise.all(
 			pubDate: String(fm.pubDate ?? ''),
 			tags,
 			body: raw,
-			html,
 			readMinutes,
 			thumb: thumbColor(firstTag),
 			thumbLabel: firstTag,
 		};
 	})
-)).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+	.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
 const [featured, ...rest] = data;
 
@@ -313,85 +309,15 @@ function fmtDate(d: string) {
 				background: var(--blog-accent);
 				color: white;
 			}
-
-			/* ── modal ── */
-			.modal {
-				position: fixed;
-				inset: 0;
-				background: rgba(15, 18, 25, 0.55);
-				display: none;
-				align-items: flex-start;
-				justify-content: center;
-				padding: 6vh 1.25em;
-				z-index: 50;
-				opacity: 0;
-				transition: opacity 200ms ease;
-				overflow-y: auto;
-			}
-			.modal.open {
-				display: flex;
-				opacity: 1;
-			}
-			.dialog {
-				position: relative;
-				background: white;
-				width: min(720px, 100%);
-				border-radius: 16px;
-				padding: 2.5rem 3rem 2rem;
-				box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-				transform: translateY(20px) scale(0.98);
-				transition: transform 250ms ease;
-			}
-			.modal.open .dialog {
-				transform: translateY(0) scale(1);
-			}
-			.close {
-				position: absolute;
-				top: 1rem;
-				right: 1rem;
-				width: 2.25rem;
-				height: 2.25rem;
-				border-radius: 50%;
-				background: rgb(var(--gray-light));
-				border: 0;
-				color: rgb(var(--black));
-				font-size: 1.1rem;
-				cursor: pointer;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				transition: background 200ms ease, color 200ms ease;
-			}
-			.close:hover {
-				background: var(--accent);
-				color: white;
-			}
-			.tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				margin: 0 0 1.25rem;
-			}
-			.tag {
-				font-size: 0.72rem;
-				font-weight: 600;
-				padding: 0.3rem 0.75rem;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-			}
-			.tag.active {
-				background: rgba(230, 57, 70, 0.12);
+			.chip.alt {
+				border-color: var(--blog-red);
 				color: var(--blog-red);
 			}
-			.modal h2 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: clamp(1.75rem, 3.4vw, 2.25rem);
-				line-height: 1.15;
-				margin: 0 0 1rem;
-				color: rgb(var(--black));
-				letter-spacing: -0.01em;
+			.chip.alt:hover {
+				background: var(--blog-red);
+				color: white;
 			}
+
 			.byline {
 				display: flex;
 				flex-wrap: wrap;
@@ -407,64 +333,71 @@ function fmtDate(d: string) {
 				color: rgb(var(--black));
 				font-weight: 600;
 			}
-			.body {
-				color: rgb(var(--gray-dark));
-				line-height: 1.7;
-				font-size: 0.95rem;
-				margin: 0 0 1.5rem;
-				white-space: pre-wrap;
-				word-wrap: break-word;
-			}
-			.body :global(h2) {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.3rem;
-				margin: 1.5em 0 0.5em;
-				color: rgb(var(--black));
-			}
-			.body :global(p) { margin: 0 0 1em; }
-			.body :global(ul),
-			.body :global(ol) { padding-left: 1.5em; margin: 0 0 1em; }
-			.body :global(code) {
-				background: rgb(var(--gray-light));
-				padding: 0.1em 0.35em;
-				border-radius: 3px;
-				font-size: 0.9em;
-			}
-			.body :global(strong) { color: rgb(var(--black)); }
-			.body :global(pre) {
-				background: rgb(var(--gray-light));
-				padding: 1em;
-				border-radius: 6px;
-				overflow-x: auto;
-				margin: 0 0 1em;
-			}
-			.body :global(pre code) {
-				background: transparent;
-				padding: 0;
-			}
-			.actions {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				gap: 1rem;
-				margin-top: 1rem;
-				padding-top: 1.25rem;
-				border-top: 1px solid rgb(var(--gray-light));
-				flex-wrap: wrap;
-			}
-			.back {
-				color: rgb(var(--gray));
+
+			/* ── card hover reveal ──
+			   Each card now navigates straight to the article page; hovering
+			   just expands to show extra info (author, date, all tags) with a
+			   subtle lift + scale. Pure CSS, no JS. */
+			.card {
 				text-decoration: none;
-				font-size: 0.9rem;
+				color: inherit;
+				will-change: transform;
 			}
-			.back:hover { color: var(--accent); }
-			.chip.alt {
-				border-color: var(--blog-red);
-				color: var(--blog-red);
+			.card-extra {
+				max-height: 0;
+				opacity: 0;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				margin-top: 0;
+				transition: max-height 220ms ease, opacity 180ms ease,
+					margin-top 220ms ease;
+				pointer-events: none;
 			}
-			.chip.alt:hover {
-				background: var(--blog-red);
-				color: white;
+			.card-extra-date {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				color: rgb(var(--gray));
+				font-size: 0.78rem;
+			}
+			.card-extra-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4rem;
+			}
+			.card:hover .card-extra,
+			.card:focus-visible .card-extra {
+				max-height: 120px;
+				opacity: 1;
+				margin-top: 0.5rem;
+				pointer-events: auto;
+			}
+			.card:hover,
+			.card:focus-visible {
+				transform: translateY(-3px) scale(1.015);
+				box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+			}
+			.card-desc {
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				display: -webkit-box;
+				overflow: hidden;
+				transition: -webkit-line-clamp 220ms ease;
+			}
+			.card:hover .card-desc,
+			.card:focus-visible .card-desc {
+				-webkit-line-clamp: 5;
+			}
+			@media (hover: none) {
+				/* Touch devices: always show extra info, no hover needed */
+				.card-extra {
+					max-height: 120px;
+					opacity: 1;
+					margin-top: 0.5rem;
+					pointer-events: auto;
+				}
 			}
 
 			@media (max-width: 720px) {
@@ -496,7 +429,7 @@ function fmtDate(d: string) {
 			</section>
 
 			{featured && (
-				<article class="featured" data-post-id={featured.id} role="button" tabindex="0">
+				<a class="featured" href={`${base}blog/${featured.id}/`} aria-label={`Read ${featured.title}`}>
 					<span class="featured-label">Featured</span>
 					<h2 class="featured-title">{featured.title}</h2>
 					<p class="featured-desc">{featured.description}</p>
@@ -507,14 +440,14 @@ function fmtDate(d: string) {
 						<span>{fmtDate(featured.pubDate)}</span>
 						<span class="dot">·</span>
 						<span>{featured.readMinutes} min read</span>
-						<a class="read-link" href="#">Read article →</a>
+						<span class="read-link">Read article →</span>
 					</div>
-				</article>
+				</a>
 			)}
 
 			<div class="cards">
 				{rest.map((post) => (
-					<article class="card" data-post-id={post.id} role="button" tabindex="0">
+					<a class="card" href={`${base}blog/${post.id}/`} aria-label={`Read ${post.title}`}>
 						<div class="card-thumb" style={`background:${post.thumb}`}>{post.thumbLabel}</div>
 						<div class="card-body">
 							<div class="card-meta-top">
@@ -523,203 +456,22 @@ function fmtDate(d: string) {
 							</div>
 							<h3 class="card-title">{post.title}</h3>
 							<p class="card-desc">{post.description}</p>
-							<div class="card-footer">
-								<div class="byline-mini">
+							<div class="card-extra">
+								<div class="card-extra-date">
 									<span class="avatar">{post.author.slice(0, 2).toUpperCase()}</span>
 									<span class="author">{post.author}</span>
 									<span class="dot">·</span>
 									<span>{fmtDate(post.pubDate)}</span>
 								</div>
-								<div class="chips">
+								<div class="card-extra-tags">
 									{post.tags.map((t) => <span class="chip">{t}</span>)}
 								</div>
 							</div>
 						</div>
-					</article>
+					</a>
 				))}
 			</div>
 		</main>
 		<Footer />
-
-		<div
-			class="modal"
-			id="article-modal"
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="modal-title"
-			aria-hidden="true"
-		>
-			<article class="dialog" id="modal-dialog">
-				<button class="close" type="button" id="modal-close" aria-label="关闭">×</button>
-				<div class="tags" id="modal-tags"></div>
-				<h2 id="modal-title"></h2>
-				<div class="byline">
-					<span class="avatar" id="modal-avatar"></span>
-					<span class="author" id="modal-author"></span>
-					<span class="dot">·</span>
-					<span id="modal-date"></span>
-					<span class="dot">·</span>
-					<span id="modal-read"></span>
-				</div>
-				<div class="body" id="modal-body"></div>
-				<div class="actions">
-					<a class="back" id="modal-back" href="#">← 返回文章列表</a>
-					<div class="chips" id="modal-chips"></div>
-				</div>
-			</article>
-		</div>
-
-		<script type="application/json" id="posts-data" set:html={JSON.stringify(data)} />
-
-		<script is:inline>
-			(() => {
-				const data = JSON.parse(
-					document.getElementById('posts-data').textContent || '[]',
-				);
-				const base = document.querySelector('base')?.getAttribute('href') || '/astro-blog/';
-				const modal = document.getElementById('article-modal');
-				const titleEl = document.getElementById('modal-title');
-				const tagsEl = document.getElementById('modal-tags');
-				const avatarEl = document.getElementById('modal-avatar');
-				const authorEl = document.getElementById('modal-author');
-				const dateEl = document.getElementById('modal-date');
-				const readEl = document.getElementById('modal-read');
-				const bodyEl = document.getElementById('modal-body');
-				const chipsEl = document.getElementById('modal-chips');
-				const backEl = document.getElementById('modal-back');
-				const closeBtn = document.getElementById('modal-close');
-				let lastFocus = null;
-
-				// Same date format as the blog list and the article page
-				function fmtDate(d) {
-					return new Date(d).toLocaleDateString('en-US', {
-						year: 'numeric',
-						month: 'short',
-						day: 'numeric',
-					});
-				}
-
-				function open(id) {
-					const post = data.find((p) => p.id === id);
-					if (!post) return;
-					lastFocus = document.activeElement;
-					titleEl.textContent = post.title;
-					tagsEl.innerHTML = (post.tags || [])
-						.map((t, i) => `<span class="tag${i === 0 ? ' active' : ''}">${t}</span>`)
-						.join('');
-					avatarEl.textContent = (post.author || '?').slice(0, 2).toUpperCase();
-					authorEl.textContent = post.author;
-					dateEl.textContent = fmtDate(post.pubDate);
-					dateEl.setAttribute('datetime', post.pubDate);
-					readEl.textContent = `${post.readMinutes} min read`;
-					// Use the same compiled HTML as the article page so the
-					// modal preview and the real article are always in sync.
-					bodyEl.innerHTML = post.html || '';
-					chipsEl.innerHTML = '';
-					backEl.href = `${base}blog/${post.id}/`;
-					modal.classList.add('open');
-					modal.setAttribute('aria-hidden', 'false');
-					document.body.style.overflow = 'hidden';
-					setTimeout(() => closeBtn.focus(), 50);
-				}
-
-				function close() {
-					modal.classList.remove('open');
-					modal.setAttribute('aria-hidden', 'true');
-					document.body.style.overflow = '';
-					if (lastFocus && lastFocus.focus) lastFocus.focus();
-				}
-
-				document.querySelectorAll('[data-post-id]').forEach((el) => {
-					el.addEventListener('click', () => open(el.dataset.postId));
-					el.addEventListener('keydown', (e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							open(el.dataset.postId);
-						}
-					});
-				});
-				closeBtn.addEventListener('click', close);
-				modal.addEventListener('click', (e) => {
-					if (e.target === modal) close();
-				});
-				document.addEventListener('keydown', (e) => {
-					if (e.key === 'Escape' && modal.classList.contains('open')) close();
-				});
-			})();
-		</script>
-		<style is:global>
-			/* Modal uses innerHTML-injected children, which never get Astro's
-			   data-astro-cid and therefore can't be styled by scoped rules.
-			   These :global rules mirror the same look as the article page so
-			   the modal preview is visually consistent with the real article. */
-			#article-modal .tag {
-				font-size: 0.72rem;
-				font-weight: 600;
-				padding: 0.3rem 0.75rem;
-				border-radius: 999px;
-				background: rgb(var(--gray-light));
-				color: rgb(var(--gray-dark));
-				display: inline-block;
-			}
-			#article-modal .tag.active {
-				background: rgba(230, 57, 70, 0.12);
-				color: #e63946;
-			}
-			#article-modal .body {
-				color: rgb(var(--gray-dark));
-				line-height: 1.7;
-				font-size: 0.95rem;
-				margin: 0 0 1.5rem;
-				word-wrap: break-word;
-			}
-			#article-modal .body h2 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.3rem;
-				margin: 1.5em 0 0.5em;
-				color: rgb(var(--black));
-			}
-			#article-modal .body h3 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.1rem;
-				margin: 1.4em 0 0.4em;
-				color: rgb(var(--black));
-			}
-			#article-modal .body p { margin: 0 0 1em; }
-			#article-modal .body ul,
-			#article-modal .body ol { padding-left: 1.5em; margin: 0 0 1em; }
-			#article-modal .body code {
-				background: rgb(var(--gray-light));
-				padding: 0.1em 0.35em;
-				border-radius: 3px;
-				font-size: 0.9em;
-			}
-			#article-modal .body strong { color: rgb(var(--black)); }
-			#article-modal .body pre {
-				background: rgb(var(--gray-light));
-				padding: 1em;
-				border-radius: 6px;
-				overflow-x: auto;
-				margin: 0 0 1em;
-			}
-			#article-modal .body pre code {
-				background: transparent;
-				padding: 0;
-			}
-			#article-modal .chip {
-				font-size: 0.7rem;
-				font-weight: 600;
-				padding: 0.25rem 0.6rem;
-				border-radius: 4px;
-				border: 1px solid var(--accent);
-				color: var(--accent);
-				background: white;
-				text-decoration: none;
-				transition: background 200ms ease, color 200ms ease;
-			}
-			#article-modal .chip:hover { background: var(--accent); color: white; }
-			#article-modal .chip.alt { border-color: #e63946; color: #e63946; }
-			#article-modal .chip.alt:hover { background: #e63946; color: white; }
-		</style>
 	</body>
 </html>
