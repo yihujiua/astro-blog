@@ -3,25 +3,76 @@ import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 
-export function getStaticPaths() {
+interface TocItem {
+	text: string;
+	id: string;
+	level: number;
+}
+interface RelatedPost {
+	slug: string;
+	title: string;
+	tags: string[];
+}
+interface PostData {
+	slug: string;
+	title: string;
+	description: string;
+	pubDate: string;
+	tags: string[];
+	html: string;
+}
+
+export async function getStaticPaths() {
 	const modules = import.meta.glob('/src/content/blog/*.md', { eager: true });
-	return Object.entries(modules).map(([path, mod]) => {
-		const slug = path.split('/').pop()!.replace(/\.md$/, '');
-		return { params: { slug }, props: { post: mod } };
+	const all = await Promise.all(
+		Object.entries(modules).map(async ([path, mod]) => {
+			const raw = (mod as any).frontmatter;
+			const fm = typeof raw === 'function' ? raw() : (raw ?? {});
+			const cc = (mod as any).compiledContent;
+			const html = typeof cc === 'function' ? await cc() : cc;
+			const slug = path.split('/').pop()!.replace(/\.md$/, '');
+			const tags = Array.isArray(fm.tags) ? fm.tags.map(String) : [];
+			return {
+				slug,
+				html: html ?? '',
+				title: String(fm.title ?? slug),
+				description: String(fm.description ?? ''),
+				pubDate: String(fm.pubDate ?? ''),
+				tags,
+			};
+		})
+	);
+	return all.map((post) => {
+		const others = all
+			.filter((p) => p.slug !== post.slug)
+			.map((p) => ({
+				slug: p.slug,
+				title: p.title,
+				tags: p.tags,
+				score: p.tags.filter((t) => post.tags.includes(t)).length,
+			}));
+		// Prefer tag overlap; fall back to other posts by date when none share tags
+		const pool = others.some((p) => p.score > 0) ? others.filter((p) => p.score > 0) : others;
+		const related: RelatedPost[] = pool
+			.sort((a, b) => b.score - a.score || (b.pubDate > a.pubDate ? 1 : a.pubDate > b.pubDate ? -1 : 0))
+			.slice(0, 3)
+			.map(({ slug, title, tags }) => ({ slug, title, tags }));
+		return { params: { slug: post.slug }, props: { post, related } };
 	});
 }
 
-const { slug } = Astro.params;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mod: any = Astro.props.post;
-const rawFm = mod.frontmatter;
-const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
-const title = String(fm.title ?? slug);
-const description = String(fm.description ?? '');
-const tags = Array.isArray(fm.tags) ? fm.tags.map(String) : [];
-const pubDate = String(fm.pubDate ?? '');
-const rawHtml: string = (typeof mod.compiledContent === 'function' ? mod.compiledContent() : mod.compiledContent) ?? '';
+const post: PostData = Astro.props.post;
+const related: RelatedPost[] = Astro.props.related ?? [];
+const { title, description, pubDate, tags, html, slug } = post;
 const base = import.meta.env.BASE_URL;
+
+// Inject sequential ids into <h2>/<h3> and build the TOC list
+const toc: TocItem[] = [];
+const rawHtml = html.replace(/<h([23])\s+id="([^"]+)">([\s\S]*?)<\/h\1>/g, (_m, lvl, id, inner) => {
+	const text = inner.replace(/<[^>]+>/g, '').trim();
+	toc.push({ text, id, level: parseInt(lvl, 10) });
+	return `<h${lvl} id="${id}">${inner}</h${lvl}>`;
+});
 ---
 
 <!doctype html>
@@ -29,11 +80,43 @@ const base = import.meta.env.BASE_URL;
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
-			main {
-				max-width: 720px;
-				margin: 0 auto;
-				padding: 3em 1.5em 6em;
+			:global(html) {
+				scroll-behavior: smooth;
 			}
+
+			/* ── reading progress bar ── */
+			.progress {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 3px;
+				background: transparent;
+				z-index: 100;
+			}
+			.progress-bar {
+				height: 100%;
+				width: 0%;
+				background: var(--accent);
+				transition: width 0.1s linear;
+			}
+
+			main {
+				width: 100%;
+			}
+			.shell {
+				max-width: 1000px;
+				margin: 0 auto;
+				padding: 1.5em 1.5em 6em;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 230px;
+				gap: 3rem;
+				align-items: start;
+			}
+			.content {
+				min-width: 0;
+			}
+
 			.back {
 				display: inline-flex;
 				align-items: center;
@@ -43,7 +126,10 @@ const base = import.meta.env.BASE_URL;
 				font-size: 0.875rem;
 				margin-bottom: 2.5rem;
 			}
-			.back:hover { color: var(--accent); }
+			.back:hover {
+				color: var(--accent);
+			}
+
 			.tags {
 				display: flex;
 				flex-wrap: wrap;
@@ -71,50 +157,272 @@ const base = import.meta.env.BASE_URL;
 				color: rgb(var(--gray));
 				margin-bottom: 2rem;
 			}
-			article {
+
+			/* ── prose ── */
+			.prose {
 				color: rgb(var(--gray-dark));
 				line-height: 1.7;
 				font-size: 0.95rem;
 			}
-			article :global(h2) {
+			.prose :global(h2) {
 				font-family: ui-serif, Georgia, 'Times New Roman', serif;
 				font-size: 1.3rem;
 				margin: 2em 0 0.5em;
 				color: rgb(var(--black));
+				scroll-margin-top: 1.5rem;
 			}
-			article :global(p) { margin: 0 0 1em; }
-			article :global(ul), article :global(ol) { padding-left: 1.5em; margin: 0 0 1em; }
-			article :global(code) {
+			.prose :global(h3) {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.1rem;
+				margin: 1.6em 0 0.4em;
+				color: rgb(var(--black));
+				scroll-margin-top: 1.5rem;
+			}
+			.prose :global(p) {
+				margin: 0 0 1em;
+			}
+			.prose :global(ul),
+			.prose :global(ol) {
+				padding-left: 1.5em;
+				margin: 0 0 1em;
+			}
+			.prose :global(code) {
 				background: rgb(var(--gray-light));
 				padding: 0.1em 0.35em;
 				border-radius: 3px;
 				font-size: 0.9em;
 			}
-			article :global(strong) { color: rgb(var(--black)); }
-			article :global(pre) {
+			.prose :global(strong) {
+				color: rgb(var(--black));
+			}
+			.prose :global(pre) {
 				background: rgb(var(--gray-light));
 				padding: 1.25em;
 				border-radius: 8px;
 				overflow-x: auto;
 				margin: 1.5em 0;
 			}
-			article :global(pre code) { background: none; padding: 0; font-size: 0.875rem; }
+			.prose :global(pre code) {
+				background: none;
+				padding: 0;
+				font-size: 0.875rem;
+			}
+
+			/* ── table of contents ── */
+			.toc {
+				position: sticky;
+				top: 5rem;
+				align-self: start;
+			}
+			.toc-title {
+				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-size: 0.78rem;
+				font-weight: 700;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: var(--accent);
+				margin: 0 0 0.9rem;
+			}
+			.toc ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				border-left: 2px solid rgb(var(--gray-light));
+			}
+			.toc li {
+				margin: 0;
+			}
+			.toc a {
+				display: block;
+				padding: 0.35rem 0 0.35rem 0.9rem;
+				margin-left: -2px;
+				border-left: 2px solid transparent;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				font-size: 0.85rem;
+				line-height: 1.4;
+				transition: color 160ms ease, border-color 160ms ease;
+			}
+			.toc li.lvl-3 a {
+				padding-left: 1.9rem;
+				font-size: 0.8rem;
+			}
+			.toc a:hover {
+				color: var(--accent);
+			}
+			.toc a.active {
+				color: var(--accent);
+				font-weight: 600;
+				border-left-color: var(--accent);
+			}
+
+			/* ── related articles ── */
+			.related {
+				margin-top: 4rem;
+				padding-top: 2.5rem;
+				border-top: 1px solid rgba(0, 0, 0, 0.08);
+			}
+			.related h2 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.4rem;
+				margin: 0 0 1.5rem;
+				color: rgb(var(--black));
+			}
+			.related-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1rem;
+			}
+			.rel-card {
+				display: flex;
+				flex-direction: column;
+				gap: 0.6rem;
+				padding: 1.1rem;
+				border: 1px solid rgba(0, 0, 0, 0.08);
+				border-radius: 12px;
+				background: white;
+				text-decoration: none;
+				transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+			}
+			.rel-card:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 24px rgba(var(--gray), 15%);
+				border-color: var(--accent);
+			}
+			.rel-card h3 {
+				margin: 0;
+				font-size: 0.98rem;
+				font-weight: 700;
+				line-height: 1.35;
+				color: rgb(var(--black));
+			}
+			.rel-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.35rem;
+				margin-top: auto;
+			}
+			.rel-tag {
+				font-size: 0.68rem;
+				font-weight: 600;
+				padding: 0.2rem 0.55rem;
+				border-radius: 999px;
+				background: rgba(35, 55, 255, 0.1);
+				color: var(--accent);
+			}
+
+			@media (max-width: 980px) {
+				.shell {
+					grid-template-columns: 1fr;
+					gap: 0;
+				}
+				.toc {
+					display: none;
+				}
+			}
 			@media (max-width: 600px) {
-				main { padding: 2em 1.25em 4em; }
+				.shell {
+					padding: 1.25em 1.25em 4em;
+				}
+				.related-grid {
+					grid-template-columns: 1fr;
+				}
 			}
 		</style>
 	</head>
 	<body>
+		<div class="progress" aria-hidden="true">
+			<div class="progress-bar" id="progress-bar"></div>
+		</div>
+
 		<Header />
 		<main>
-			<a class="back" href={`${base}blog/`}>← 博客列表</a>
-			<div class="tags">
-				{tags.map((t: string) => <span class="tag">{t}</span>)}
+			<div class="shell">
+				<div class="content">
+					<a class="back" href={`${base}blog/`}>← 博客列表</a>
+
+					{
+						tags.length > 0 && (
+							<div class="tags">
+								{tags.map((t: string) => <span class="tag">{t}</span>)}
+							</div>
+						)
+					}
+
+					<h1>{title}</h1>
+					<time>{pubDate}</time>
+
+					<article class="prose" set:html={rawHtml} />
+
+					{
+						related.length > 0 && (
+							<section class="related">
+								<h2>相关文章</h2>
+								<div class="related-grid">
+									{related.map((r) => (
+										<a class="rel-card" href={`${base}blog/${r.slug}/`}>
+											<h3>{r.title}</h3>
+											<div class="rel-tags">
+												{r.tags.map((t: string) => <span class="rel-tag">{t}</span>)}
+											</div>
+										</a>
+									))}
+								</div>
+							</section>
+						)
+					}
+				</div>
+
+				{
+					toc.length > 0 && (
+						<aside class="toc">
+							<p class="toc-title">目录</p>
+							<ul>
+								{toc.map((item) => (
+									<li class={`lvl-${item.level}`}>
+										<a href={`#${item.id}`}>{item.text}</a>
+									</li>
+								))}
+							</ul>
+						</aside>
+					)
+				}
 			</div>
-			<h1>{title}</h1>
-			<time>{pubDate}</time>
-			<article set:html={rawHtml} />
 		</main>
 		<Footer />
+
+		<script>
+			// Reading progress bar
+			const bar = document.getElementById('progress-bar');
+			function onScroll() {
+				const max = document.documentElement.scrollHeight - window.innerHeight;
+				const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+				if (bar) bar.style.width = Math.min(100, Math.max(0, pct)) + '%';
+			}
+			window.addEventListener('scroll', onScroll, { passive: true });
+			onScroll();
+
+			// Active TOC highlight via IntersectionObserver
+			const links = Array.from(document.querySelectorAll('.toc a')) as HTMLAnchorElement[];
+			if (links.length) {
+				const map = new Map(links.map((a) => [a.getAttribute('href')!.slice(1), a]));
+				const headings = Array.from(
+					document.querySelectorAll('article.prose :is(h2, h3)')
+				) as HTMLElement[];
+				const obs = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((e) => {
+							if (e.isIntersecting) {
+								links.forEach((l) => l.classList.remove('active'));
+								const a = map.get(e.target.id);
+								if (a) a.classList.add('active');
+							}
+						});
+					},
+					{ rootMargin: '0px 0px -70% 0px', threshold: 0 }
+				);
+				headings.forEach((h) => obs.observe(h));
+			}
+		</script>
 	</body>
 </html>
