@@ -1,4 +1,4 @@
----
+﻿---
 import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
@@ -16,6 +16,7 @@ interface PostData {
 	pubDate: string;
 	tags: string[];
 	body: string;
+	html: string;
 	readMinutes: number;
 	thumb: string;
 	thumbLabel: string;
@@ -28,12 +29,14 @@ function thumbColor(seed: string): string {
 	return PALETTE[Math.abs(h) % PALETTE.length];
 }
 
-const data: PostData[] = Object.entries(modules)
-	.map(([path, mod]) => {
+const data: PostData[] = (await Promise.all(
+	Object.entries(modules).map(async ([path, mod]) => {
 		const rawFm = (mod as any).frontmatter;
 		const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
 		const slug = path.split('/').pop()!.replace(/\.md$/, '');
 		const raw: string = (typeof (mod as any).rawContent === 'function' ? (mod as any).rawContent() : (mod as any).rawContent) ?? '';
+		const cc = (mod as any).compiledContent;
+		const html: string = (typeof cc === 'function' ? await cc() : cc) ?? '';
 		const stripped = raw
 			.replace(/```[\s\S]*?```/g, ' ')
 			.replace(/`[^`]*`/g, ' ')
@@ -52,12 +55,13 @@ const data: PostData[] = Object.entries(modules)
 			pubDate: String(fm.pubDate ?? ''),
 			tags,
 			body: raw,
+			html,
 			readMinutes,
 			thumb: thumbColor(firstTag),
 			thumbLabel: firstTag,
 		};
 	})
-	.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+)).sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
 const [featured, ...rest] = data;
 
@@ -310,7 +314,7 @@ function fmtDate(d: string) {
 				color: white;
 			}
 
-			/* ── modal (unchanged) ── */
+			/* ── modal ── */
 			.modal {
 				position: fixed;
 				inset: 0;
@@ -586,62 +590,13 @@ function fmtDate(d: string) {
 				const closeBtn = document.getElementById('modal-close');
 				let lastFocus = null;
 
-				function md(text) {
-					const escape = (s) =>
-						s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-					const lines = escape(text).split(/\n/);
-					const out = [];
-					let inUl = false;
-					let inOl = false;
-					let inCode = false;
-					let inP = false;
-					const closeLists = () => {
-						if (inUl) { out.push('</ul>'); inUl = false; }
-						if (inOl) { out.push('</ol>'); inOl = false; }
-					};
-					const closeP = () => { if (inP) { out.push('</p>'); inP = false; } };
-					for (const raw of lines) {
-						const line = raw.trimEnd();
-						if (line.startsWith('```')) {
-							closeP(); closeLists();
-							if (inCode) { out.push('</code></pre>'); inCode = false; }
-							else { out.push('<pre><code>'); inCode = true; }
-							continue;
-						}
-						if (inCode) { out.push(line); continue; }
-						if (!line.trim()) { closeP(); closeLists(); continue; }
-						const h = line.match(/^(#{1,6})\s+(.*)$/);
-						if (h) {
-							closeP(); closeLists();
-							out.push(`<h${h[1].length}>${inline(h[2])}</h${h[1].length}>`);
-							continue;
-						}
-						const ul = line.match(/^[-*+]\s+(.*)$/);
-						if (ul) {
-							closeP();
-							if (!inUl) { closeLists(); out.push('<ul>'); inUl = true; }
-							out.push(`<li>${inline(ul[1])}</li>`);
-							continue;
-						}
-						const ol = line.match(/^\d+\.\s+(.*)$/);
-						if (ol) {
-							closeP();
-							if (!inOl) { closeLists(); out.push('<ol>'); inOl = true; }
-							out.push(`<li>${inline(ol[1])}</li>`);
-							continue;
-						}
-						if (!inP) { closeLists(); out.push('<p>'); inP = true; } else { out.push('<br/>'); }
-						out.push(inline(line));
-					}
-					closeP(); closeLists();
-					if (inCode) out.push('</code></pre>');
-					function inline(s) {
-						return s
-							.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-							.replace(/`([^`]+)`/g, '<code>$1</code>')
-							.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-					}
-					return out.join('');
+				// Same date format as the blog list and the article page
+				function fmtDate(d) {
+					return new Date(d).toLocaleDateString('en-US', {
+						year: 'numeric',
+						month: 'short',
+						day: 'numeric',
+					});
 				}
 
 				function open(id) {
@@ -654,16 +609,14 @@ function fmtDate(d: string) {
 						.join('');
 					avatarEl.textContent = (post.author || '?').slice(0, 2).toUpperCase();
 					authorEl.textContent = post.author;
-					dateEl.textContent = post.pubDate;
+					dateEl.textContent = fmtDate(post.pubDate);
+					dateEl.setAttribute('datetime', post.pubDate);
 					readEl.textContent = `${post.readMinutes} min read`;
-					bodyEl.innerHTML = md(post.body || '');
-					chipsEl.innerHTML = (post.tags || [])
-						.map(
-							(t, i) =>
-								`<a class="chip${i > 0 ? ' alt' : ''}" href="#">More ${t}</a>`,
-						)
-						.join('');
-					backEl.href = '#';
+					// Use the same compiled HTML as the article page so the
+					// modal preview and the real article are always in sync.
+					bodyEl.innerHTML = post.html || '';
+					chipsEl.innerHTML = '';
+					backEl.href = `${base}blog/${post.id}/`;
 					modal.classList.add('open');
 					modal.setAttribute('aria-hidden', 'false');
 					document.body.style.overflow = 'hidden';
@@ -695,5 +648,78 @@ function fmtDate(d: string) {
 				});
 			})();
 		</script>
+		<style is:global>
+			/* Modal uses innerHTML-injected children, which never get Astro's
+			   data-astro-cid and therefore can't be styled by scoped rules.
+			   These :global rules mirror the same look as the article page so
+			   the modal preview is visually consistent with the real article. */
+			#article-modal .tag {
+				font-size: 0.72rem;
+				font-weight: 600;
+				padding: 0.3rem 0.75rem;
+				border-radius: 999px;
+				background: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				display: inline-block;
+			}
+			#article-modal .tag.active {
+				background: rgba(230, 57, 70, 0.12);
+				color: #e63946;
+			}
+			#article-modal .body {
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				font-size: 0.95rem;
+				margin: 0 0 1.5rem;
+				word-wrap: break-word;
+			}
+			#article-modal .body h2 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.3rem;
+				margin: 1.5em 0 0.5em;
+				color: rgb(var(--black));
+			}
+			#article-modal .body h3 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: 1.1rem;
+				margin: 1.4em 0 0.4em;
+				color: rgb(var(--black));
+			}
+			#article-modal .body p { margin: 0 0 1em; }
+			#article-modal .body ul,
+			#article-modal .body ol { padding-left: 1.5em; margin: 0 0 1em; }
+			#article-modal .body code {
+				background: rgb(var(--gray-light));
+				padding: 0.1em 0.35em;
+				border-radius: 3px;
+				font-size: 0.9em;
+			}
+			#article-modal .body strong { color: rgb(var(--black)); }
+			#article-modal .body pre {
+				background: rgb(var(--gray-light));
+				padding: 1em;
+				border-radius: 6px;
+				overflow-x: auto;
+				margin: 0 0 1em;
+			}
+			#article-modal .body pre code {
+				background: transparent;
+				padding: 0;
+			}
+			#article-modal .chip {
+				font-size: 0.7rem;
+				font-weight: 600;
+				padding: 0.25rem 0.6rem;
+				border-radius: 4px;
+				border: 1px solid var(--accent);
+				color: var(--accent);
+				background: white;
+				text-decoration: none;
+				transition: background 200ms ease, color 200ms ease;
+			}
+			#article-modal .chip:hover { background: var(--accent); color: white; }
+			#article-modal .chip.alt { border-color: #e63946; color: #e63946; }
+			#article-modal .chip.alt:hover { background: #e63946; color: white; }
+		</style>
 	</body>
 </html>
