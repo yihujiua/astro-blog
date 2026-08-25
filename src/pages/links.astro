@@ -1,0 +1,371 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL;
+
+/* ────────────────────────────────────────────────────────────
+   友链数据：在这里增加 / 修改你喜欢的友链即可。
+   每个分类(category)下是一组圆形卡片链接(links)：
+     - name   站点 / 朋友的名称（必填）
+     - url    跳转链接（必填）
+     - desc   一句话简介，鼠标滑过卡片时展开显示
+     - color  圆形头像底色（可选，默认用分类色）
+   想新增一条：在对应 links 数组里加一个对象就行。
+   ──────────────────────────────────────────────────────────── */
+interface FriendLink {
+	name: string;
+	url: string;
+	desc: string;
+	color?: string;
+}
+interface Category {
+	key: string;
+	label: string;
+	color: string;
+	links: FriendLink[];
+}
+
+const categories: Category[] = [
+	{
+		key: 'tech',
+		label: '技术博客',
+		color: '#2A6F97',
+		links: [
+			{
+				name: 'Astro 官方',
+				url: 'https://astro.build',
+				desc: '内容驱动的 Web 框架，本博客就是用它搭的。',
+			},
+			{
+				name: '阮一峰的网络日志',
+				url: 'https://www.ruanyifeng.com/blog/',
+				desc: '科技与生活的长期观察者，干货满满。',
+			},
+			{
+				name: 'ESP32 中文社区',
+				url: 'https://esp32.com',
+				desc: '玩转 ESP32 / ESP-IDF 的第一手资料与问答。',
+			},
+		],
+	},
+	{
+		key: 'friends',
+		label: '朋友们',
+		color: '#e63946',
+		links: [
+			{
+				name: '小明の博客',
+				url: 'https://example.com',
+				desc: '一个爱折腾全栈的同事，Vue 与 Node 写得很溜。',
+			},
+			{
+				name: '阿强的硬件笔记',
+				url: 'https://example.com',
+				desc: '从 STM32 到树莓派，分享大量电路与焊接经验。',
+			},
+		],
+	},
+	{
+		key: 'tools',
+		label: '工具 / 资源',
+		color: '#2D8659',
+		links: [
+			{
+				name: 'MDN Web Docs',
+				url: 'https://developer.mozilla.org',
+				desc: 'Web 技术的权威参考，前端必备。',
+			},
+			{
+				name: 'Tailwind CSS',
+				url: 'https://tailwindcss.com',
+				desc: '原子化 CSS 框架，写样式快到飞起。',
+			},
+			{
+				name: 'Ollama',
+				url: 'https://ollama.com',
+				desc: '一条命令在本地跑大模型，AI 管家的底座。',
+			},
+		],
+	},
+];
+
+const initials = (name: string) =>
+	name
+		.replace(/[^\p{L}\p{N} ]/gu, '')
+		.split(/\s+/)
+		.filter(Boolean)
+		.slice(0, 2)
+		.map((w) => w[0])
+		.join('')
+		.toUpperCase() || name.slice(0, 2);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`友链 · ${SITE_TITLE}`} description="我收藏的朋友们与技术伙伴的链接。" />
+		<style>
+			main {
+				max-width: 960px;
+				margin: 0 auto;
+				padding: 3em 1em 4em;
+			}
+			.intro {
+				max-width: 640px;
+				margin-bottom: 3em;
+			}
+			.kicker {
+				font-size: 0.8rem;
+				font-weight: 700;
+				letter-spacing: 0.15em;
+				text-transform: uppercase;
+				color: var(--accent);
+				margin: 0 0 1rem;
+			}
+			.kicker::before {
+				content: '— ';
+			}
+			h1 {
+				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-size: clamp(2.5rem, 6vw, 3.5rem);
+				line-height: 1.05;
+				margin: 0 0 1rem;
+			}
+			h1 em {
+				font-style: italic;
+				color: var(--accent);
+			}
+			.intro p {
+				color: rgb(var(--gray-dark));
+				line-height: 1.7;
+				margin: 0;
+			}
+
+			/* ── category section ── */
+			.cat-section {
+				margin-bottom: 3rem;
+			}
+			.cat-head {
+				display: flex;
+				align-items: center;
+				gap: 0.6rem;
+				margin: 0 0 1.5rem;
+			}
+			.cat-dot {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+				flex: 0 0 auto;
+			}
+			.cat-title {
+				font-size: 1.05rem;
+				font-weight: 700;
+				color: rgb(var(--black));
+				margin: 0;
+			}
+			.cat-rule {
+				flex: 1;
+				height: 1px;
+				background: rgb(var(--gray-light));
+			}
+
+			/* ── circular card grid ── */
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+				gap: 1.75rem 1rem;
+			}
+			.fl-card {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				text-decoration: none;
+				color: inherit;
+				padding: 0.5rem 0.25rem;
+				border-radius: 16px;
+				transition:
+					background 200ms ease,
+					box-shadow 200ms ease,
+					transform 200ms ease;
+			}
+			.fl-card:hover {
+				background: white;
+				box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+				transform: translateY(-3px);
+			}
+
+			/* circular thumbnail */
+			.fl-thumb {
+				width: 76px;
+				height: 76px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				font-weight: 700;
+				font-size: 1.4rem;
+				letter-spacing: 0.02em;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+				transition: transform 200ms ease;
+				will-change: transform;
+			}
+			.fl-card:hover .fl-thumb {
+				transform: scale(1.12);
+				animation: fl-jiggle 0.55s ease-in-out;
+			}
+
+			/* hover jitter: scale up + small shake */
+			@keyframes fl-jiggle {
+				0% {
+					transform: rotate(0deg) scale(1.12);
+				}
+				20% {
+					transform: rotate(-5deg) scale(1.12) translateY(-2px);
+				}
+				40% {
+					transform: rotate(5deg) scale(1.12);
+				}
+				60% {
+					transform: rotate(-4deg) scale(1.12);
+				}
+				80% {
+					transform: rotate(2deg) scale(1.12);
+				}
+				100% {
+					transform: rotate(0deg) scale(1.12);
+				}
+			}
+
+			.fl-name {
+				margin: 0.7rem 0 0;
+				font-size: 0.92rem;
+				font-weight: 600;
+				color: rgb(var(--black));
+			}
+
+			/* info revealed on hover */
+			.fl-info {
+				max-height: 0;
+				opacity: 0;
+				overflow: hidden;
+				transition:
+					max-height 220ms ease,
+					opacity 180ms ease,
+					margin-top 220ms ease;
+				margin-top: 0;
+			}
+			.fl-card:hover .fl-info,
+			.fl-card:focus-visible .fl-info {
+				max-height: 80px;
+				opacity: 1;
+				margin-top: 0.4rem;
+			}
+			.fl-desc {
+				font-size: 0.78rem;
+				line-height: 1.5;
+				color: rgb(var(--gray));
+				margin: 0 0 0.3rem;
+			}
+			.fl-go {
+				font-size: 0.72rem;
+				font-weight: 700;
+				color: var(--accent);
+			}
+
+			.hint {
+				margin-top: 2.5rem;
+				padding: 1rem 1.25rem;
+				border: 1px dashed rgb(var(--gray-light));
+				border-radius: 12px;
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+				line-height: 1.6;
+			}
+			.hint code {
+				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-size: 0.82em;
+				background: rgb(var(--gray-light));
+				padding: 0.1em 0.35em;
+				border-radius: 4px;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.fl-card:hover .fl-thumb {
+					animation: none;
+				}
+			}
+
+			@media (max-width: 720px) {
+				.grid {
+					grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+					gap: 1.25rem 0.75rem;
+				}
+				/* touch devices: always show info */
+				.fl-info {
+					max-height: 80px;
+					opacity: 1;
+					margin-top: 0.4rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro">
+				<p class="kicker">Links — 友链</p>
+				<h1>我收藏的<em>伙伴</em></h1>
+				<p>
+					这里放着我常逛的技术博客、一起折腾的朋友，以及一些顺手的工具。
+					鼠标滑过卡片，看看它们是谁 👀。
+				</p>
+			</section>
+
+			{
+				categories.map((cat) => (
+					<section class="cat-section" aria-label={cat.label}>
+						<div class="cat-head">
+							<span class="cat-dot" style={`background:${cat.color}`} />
+							<h2 class="cat-title">{cat.label}</h2>
+							<span class="cat-rule" />
+						</div>
+						<div class="grid">
+							{cat.links.map((link) => (
+								<a
+									class="fl-card"
+									href={link.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									aria-label={`访问 ${link.name}`}
+								>
+									<div
+										class="fl-thumb"
+										style={`background:${link.color ?? cat.color}`}
+									>
+										{initials(link.name)}
+									</div>
+									<p class="fl-name">{link.name}</p>
+									<div class="fl-info">
+										<p class="fl-desc">{link.desc}</p>
+										<span class="fl-go">访问 ↗</span>
+									</div>
+								</a>
+							))}
+						</div>
+					</section>
+				))
+			}
+
+			<p class="hint">
+				想加自己的友链？打开 <code>src/pages/links.astro</code>，在
+				<code>categories</code> 数组里加一条即可 —— 分类、名称、链接、简介随你填。
+			</p>
+		</main>
+		<Footer />
+	</body>
+</html>
