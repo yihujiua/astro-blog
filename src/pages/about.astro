@@ -1,7 +1,5 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const base = import.meta.env.BASE_URL;
@@ -64,11 +62,8 @@ const events: TimelineEvent[] = [
 ];
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`关于 · ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
-		<style>
+<BaseLayout title={`关于 · ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<style>
 			main {
 				max-width: 880px;
 				margin: 0 auto;
@@ -90,7 +85,7 @@ const events: TimelineEvent[] = [
 				content: '— ';
 			}
 			h1 {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
+				font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
 				font-size: clamp(2.5rem, 6vw, 3.5rem);
 				line-height: 1.05;
 				margin: 0 0 1rem;
@@ -134,7 +129,7 @@ const events: TimelineEvent[] = [
 			}
 
 			.card {
-				background: white;
+				background: var(--bg-surface);
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 12px;
 				padding: 1rem 1.25rem;
@@ -174,12 +169,12 @@ const events: TimelineEvent[] = [
 				width: 14px;
 				height: 14px;
 				border-radius: 50%;
-				background: white;
+				background: var(--bg-surface);
 				border: 2px solid currentColor;
 				justify-self: center;
 				position: relative;
 				z-index: 2;
-				box-shadow: 0 0 0 4px white;
+				box-shadow: 0 0 0 4px var(--bg-page);
 				transition: box-shadow 200ms ease, transform 200ms ease;
 			}
 
@@ -188,7 +183,7 @@ const events: TimelineEvent[] = [
 				box-shadow: 0 8px 24px rgba(var(--gray), 15%);
 			}
 			.event:hover .node {
-				box-shadow: 0 0 0 4px white, 0 0 0 6px rgb(var(--gray-light));
+				box-shadow: 0 0 0 4px var(--bg-page), 0 0 0 6px rgb(var(--gray-light));
 				transform: scale(1.15);
 			}
 			.event:hover .card::after {
@@ -250,7 +245,7 @@ const events: TimelineEvent[] = [
 				height: 12px;
 				border-radius: 50%;
 				border: 2px solid rgb(var(--gray));
-				background: white;
+				background: var(--bg-surface);
 			}
 			.legend-card {
 				width: 1.25rem;
@@ -319,11 +314,9 @@ const events: TimelineEvent[] = [
 					margin-left: 0;
 				}
 			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
+	</style>
+
+	<main>
 			<section class="intro">
 				<p class="kicker">About — 个人简介</p>
 				<h1>我的<em>折腾</em>旅程</h1>
@@ -366,7 +359,5 @@ const events: TimelineEvent[] = [
 				</p>
 				<p>欢迎一起折腾、一起交流项目想法。</p>
 			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+	</main>
+</BaseLayout>

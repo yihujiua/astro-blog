@@ -1,0 +1,32 @@
+---
+import type { ImageMetadata } from 'astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description: string;
+	/** Open Graph type; use 'article' on post pages. */
+	type?: 'website' | 'article';
+	/** Per-page OG image (falls back to the site default in BaseHead). */
+	image?: ImageMetadata;
+	header?: boolean;
+	footer?: boolean;
+}
+
+const { title, description, type = 'website', image, header = true, footer = true } =
+	Astro.props;
+---
+
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={title} description={description} type={type} image={image} />
+		<slot name="head" />
+	</head>
+	<body>
+		{header && <Header />}
+		<slot />
+		{footer && <Footer />}
+	</body>
+</html>

@@ -1,25 +1,14 @@
-﻿---
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
+---
+import FormattedDate from '../../components/FormattedDate.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { getSortedPosts, readingMinutes } from '../../utils/posts';
 
-// Vite glob — each value is the markdown module, frontmatter is a named export
-const modules = import.meta.glob('/src/content/blog/*.md', { eager: true });
 const base = import.meta.env.BASE_URL;
-
-interface PostData {
-	id: string;
-	title: string;
-	description: string;
-	author: string;
-	pubDate: string;
-	tags: string[];
-	body: string;
-	readMinutes: number;
-	thumb: string;
-	thumbLabel: string;
-}
+const posts = await getSortedPosts();
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const rest = posts.filter((p) => p !== featured);
+const AUTHOR = 'yihujiua';
 
 const PALETTE = ['#2A2A2A', '#2A6F97', '#E63946', '#2D8659', '#2337FF'];
 function thumbColor(seed: string): string {
@@ -27,451 +16,424 @@ function thumbColor(seed: string): string {
 	for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
 	return PALETTE[Math.abs(h) % PALETTE.length];
 }
-
-const data: PostData[] = Object.entries(modules)
-	.map(([path, mod]) => {
-		const rawFm = (mod as any).frontmatter;
-		const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
-		const slug = path.split('/').pop()!.replace(/\.md$/, '');
-		const raw: string = (typeof (mod as any).rawContent === 'function' ? (mod as any).rawContent() : (mod as any).rawContent) ?? '';
-		const stripped = raw
-			.replace(/```[\s\S]*?```/g, ' ')
-			.replace(/`[^`]*`/g, ' ')
-			.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-			.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-			.replace(/[#>*_\-]/g, ' ');
-		const words = stripped.trim().split(/\s+/).filter(Boolean).length;
-		const readMinutes = Math.max(1, Math.round(words / 280));
-		const tags = Array.isArray(fm.tags) ? fm.tags.map(String) : [];
-		const firstTag = tags[0] ?? slug;
-		return {
-			id: slug,
-			title: String(fm.title ?? slug),
-			description: String(fm.description ?? ''),
-			author: 'yihujiua',
-			pubDate: String(fm.pubDate ?? ''),
-			tags,
-			body: raw,
-			readMinutes,
-			thumb: thumbColor(firstTag),
-			thumbLabel: firstTag,
-		};
-	})
-	.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
-
-const [featured, ...rest] = data;
-
-function fmtDate(d: string) {
-	return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={`博客 — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
-		<style>
-			:root {
-				--blog-accent: var(--accent);
-				--blog-red: #e63946;
-				--blog-border: rgba(0, 0, 0, 0.08);
-				--blog-muted: rgb(var(--gray));
-			}
+<BaseLayout title={`博客 — ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
+	<main>
+		<section class="page-head">
+			<h1>Latest Articles</h1>
+			<p class="sub">
+				Showing {posts.length} articles · <a href={`${base}tags/`}>按标签浏览 →</a>
+			</p>
+			<span class="read-hint">Click to read</span>
+		</section>
 
-			main {
-				max-width: 760px;
-				margin: 0 auto;
-				padding: 3em 1.5em 6em;
-			}
-
-			/* ── page head ── */
-			.page-head {
-				display: grid;
-				grid-template-columns: 1fr auto;
-				grid-template-rows: auto auto;
-				align-items: center;
-				gap: 0.5rem 1rem;
-				padding: 1em 0 2em;
-				border-bottom: 1px solid var(--blog-border);
-				margin-bottom: 2em;
-			}
-			.page-head h1 {
-				grid-column: 1;
-				grid-row: 1;
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: clamp(2.25rem, 5vw, 3.25rem);
-				line-height: 1;
-				margin: 0;
-				letter-spacing: -0.02em;
-				color: rgb(var(--black));
-			}
-			.page-head .sub {
-				grid-column: 1;
-				grid-row: 2;
-				margin: 0;
-				color: rgb(var(--gray));
-				font-size: 0.95rem;
-			}
-			.read-hint {
-				grid-column: 2;
-				grid-row: 1 / span 2;
-				background: rgb(var(--black));
-				color: white;
-				font-size: 0.78rem;
-				padding: 0.4rem 0.9rem;
-				border-radius: 999px;
-				justify-self: end;
-				align-self: center;
-				white-space: nowrap;
-				font-weight: 600;
-				letter-spacing: 0.02em;
-			}
-
-			/* ── featured ── */
-			.featured {
-				padding: 0.5em 0 2em;
-				cursor: pointer;
-				border-bottom: 1px solid var(--blog-border);
-				margin-bottom: 1.5em;
-			}
-			.featured-label {
-				color: var(--blog-red);
-				font-family: var(--font-atkinson), system-ui, sans-serif;
-				font-size: 0.78rem;
-				font-weight: 700;
-				text-transform: uppercase;
-				letter-spacing: 0.22em;
-				display: inline-block;
-				margin-bottom: 0.6rem;
-			}
-			.featured-title {
-				font-family: var(--font-atkinson), system-ui, sans-serif;
-				font-size: clamp(1.85rem, 4vw, 2.5rem);
-				line-height: 1.15;
-				margin: 0 0 0.75rem;
-				color: rgb(var(--black));
-				letter-spacing: -0.01em;
-				font-weight: 700;
-			}
-			.featured-desc {
-				color: rgb(var(--gray));
-				margin: 0 0 1rem;
-				max-width: 640px;
-				line-height: 1.55;
-				font-size: 1rem;
-			}
-			.featured .byline {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.5rem;
-				align-items: center;
-				font-size: 0.85rem;
-				color: rgb(var(--gray));
-			}
-			.read-link {
-				margin-left: 0.5rem;
-				color: var(--blog-accent);
-				font-weight: 600;
-				text-decoration: none;
-				font-size: 0.9rem;
-			}
-			.read-link:hover { text-decoration: underline; }
-			.dot { color: rgb(var(--gray)); }
-
-			.avatar {
-				width: 1.5rem;
-				height: 1.5rem;
-				border-radius: 50%;
-				background: var(--blog-red);
-				color: white;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 0.7rem;
-				font-weight: 700;
-			}
-
-			/* ── cards ── */
-			.cards {
-				display: flex;
-				flex-direction: column;
-				gap: 1.25rem;
-			}
-			.card {
-				display: flex;
-				gap: 1.25rem;
-				padding: 1.25rem;
-				border: 1px solid var(--blog-border);
-				border-radius: 12px;
-				background: white;
-				cursor: pointer;
-				transition: box-shadow 200ms ease, transform 200ms ease;
-			}
-			.card:hover {
-				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-				transform: translateY(-1px);
-			}
-			.card-thumb {
-				flex: 0 0 80px;
-				width: 80px;
-				height: 80px;
-				border-radius: 8px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				color: white;
-				font-weight: 700;
-				font-size: 0.72rem;
-				text-transform: uppercase;
-				letter-spacing: 0.04em;
-				text-align: center;
-				padding: 0.5rem;
-				line-height: 1.15;
-				word-break: break-word;
-			}
-			.card-body {
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-				gap: 0.4rem;
-				min-width: 0;
-			}
-			.card-meta-top {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				font-size: 0.78rem;
-				color: rgb(var(--gray));
-			}
-			.card-tag {
-				background: rgba(35, 55, 255, 0.1);
-				color: var(--blog-accent);
-				padding: 0.2rem 0.6rem;
-				border-radius: 4px;
-				font-weight: 700;
-				font-size: 0.7rem;
-				letter-spacing: 0.02em;
-			}
-			.card-read { white-space: nowrap; }
-			.card-title {
-				font-family: ui-serif, Georgia, 'Times New Roman', serif;
-				font-size: 1.3rem;
-				line-height: 1.2;
-				margin: 0.15rem 0;
-				color: rgb(var(--black));
-				letter-spacing: -0.01em;
-			}
-			.card-desc {
-				color: rgb(var(--gray));
-				margin: 0;
-				font-size: 0.9rem;
-				line-height: 1.5;
-				display: -webkit-box;
-				-webkit-line-clamp: 2;
-				-webkit-box-orient: vertical;
-				overflow: hidden;
-			}
-			.card-footer {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				gap: 1rem;
-				margin-top: 0.4rem;
-				flex-wrap: wrap;
-			}
-			.byline-mini {
-				display: flex;
-				gap: 0.5rem;
-				align-items: center;
-				font-size: 0.82rem;
-				color: rgb(var(--gray));
-			}
-			.byline-mini .author {
-				color: rgb(var(--black));
-				font-weight: 600;
-			}
-			.chips {
-				display: flex;
-				gap: 0.4rem;
-				flex-wrap: wrap;
-			}
-			.chip {
-				font-size: 0.7rem;
-				font-weight: 600;
-				padding: 0.25rem 0.6rem;
-				border-radius: 4px;
-				border: 1px solid var(--blog-accent);
-				color: var(--blog-accent);
-				background: white;
-				transition: background 200ms ease, color 200ms ease;
-			}
-			.chip:hover {
-				background: var(--blog-accent);
-				color: white;
-			}
-			.chip.alt {
-				border-color: var(--blog-red);
-				color: var(--blog-red);
-			}
-			.chip.alt:hover {
-				background: var(--blog-red);
-				color: white;
-			}
-
-			.byline {
-				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 0.75rem;
-				margin: 0 0 1.5rem;
-				padding-bottom: 1.25rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
-				font-size: 0.85rem;
-				color: rgb(var(--gray));
-			}
-			.author {
-				color: rgb(var(--black));
-				font-weight: 600;
-			}
-
-			/* ── card hover reveal ──
-			   Each card now navigates straight to the article page; hovering
-			   just expands to show extra info (author, date, all tags) with a
-			   subtle lift + scale. Pure CSS, no JS. */
-			.card {
-				text-decoration: none;
-				color: inherit;
-				will-change: transform;
-			}
-			.card-extra {
-				max-height: 0;
-				opacity: 0;
-				overflow: hidden;
-				display: flex;
-				flex-direction: column;
-				gap: 0.5rem;
-				margin-top: 0;
-				transition: max-height 220ms ease, opacity 180ms ease,
-					margin-top 220ms ease;
-				pointer-events: none;
-			}
-			.card-extra-date {
-				display: flex;
-				align-items: center;
-				gap: 0.5rem;
-				color: rgb(var(--gray));
-				font-size: 0.78rem;
-			}
-			.card-extra-tags {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 0.4rem;
-			}
-			.card:hover .card-extra,
-			.card:focus-visible .card-extra {
-				max-height: 120px;
-				opacity: 1;
-				margin-top: 0.5rem;
-				pointer-events: auto;
-			}
-			.card:hover,
-			.card:focus-visible {
-				transform: translateY(-3px) scale(1.015);
-				box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
-			}
-			.card-desc {
-				-webkit-line-clamp: 2;
-				-webkit-box-orient: vertical;
-				display: -webkit-box;
-				overflow: hidden;
-				transition: -webkit-line-clamp 220ms ease;
-			}
-			.card:hover .card-desc,
-			.card:focus-visible .card-desc {
-				-webkit-line-clamp: 5;
-			}
-			@media (hover: none) {
-				/* Touch devices: always show extra info, no hover needed */
-				.card-extra {
-					max-height: 120px;
-					opacity: 1;
-					margin-top: 0.5rem;
-					pointer-events: auto;
-				}
-			}
-
-			@media (max-width: 720px) {
-				main { padding: 2em 1.25em 4em; }
-				.featured { padding: 0.5em 0 1.5em; }
-				.card {
-					flex-direction: column;
-					padding: 1rem;
-				}
-				.card-thumb {
-					width: 64px;
-					height: 64px;
-					flex-basis: 64px;
-				}
-				.card-title { font-size: 1.15rem; }
-				.dialog { padding: 1.75rem 1.5rem 1.5rem; }
-				.actions { flex-direction: column-reverse; align-items: stretch; }
-				.chips { justify-content: flex-end; }
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section class="page-head">
-				<h1>Latest Articles</h1>
-				<p class="sub">Showing {data.length} articles</p>
-				<span class="read-hint">Click to read</span>
-			</section>
-
-			{featured && (
-				<a class="featured" href={`${base}blog/${featured.id}/`} aria-label={`Read ${featured.title}`}>
+		{
+			featured && (
+				<a class="featured" href={`${base}blog/${featured.id}/`} aria-label={`Read ${featured.data.title}`}>
 					<span class="featured-label">Featured</span>
-					<h2 class="featured-title">{featured.title}</h2>
-					<p class="featured-desc">{featured.description}</p>
+					<h2 class="featured-title">{featured.data.title}</h2>
+					<p class="featured-desc">{featured.data.description}</p>
 					<div class="byline">
-						<span class="avatar">{featured.author.slice(0, 2).toUpperCase()}</span>
-						<span class="author">{featured.author}</span>
+						<span class="avatar">{AUTHOR.slice(0, 2).toUpperCase()}</span>
+						<span class="author">{AUTHOR}</span>
 						<span class="dot">·</span>
-						<span>{fmtDate(featured.pubDate)}</span>
+						<span>
+							<FormattedDate date={featured.data.pubDate} />
+						</span>
 						<span class="dot">·</span>
-						<span>{featured.readMinutes} min read</span>
+						<span>{readingMinutes(featured.body)} min read</span>
 						<span class="read-link">Read article →</span>
 					</div>
 				</a>
-			)}
+			)
+		}
 
-			<div class="cards">
-				{rest.map((post) => (
-					<a class="card" href={`${base}blog/${post.id}/`} aria-label={`Read ${post.title}`}>
-						<div class="card-thumb" style={`background:${post.thumb}`}>{post.thumbLabel}</div>
+		<div class="cards">
+			{
+				rest.map((post) => (
+					<a class="card" href={`${base}blog/${post.id}/`} aria-label={`Read ${post.data.title}`}>
+						<div
+							class="card-thumb"
+							style={`background:${thumbColor(post.data.tags[0] ?? post.id)}`}
+						>
+							{post.data.tags[0] ?? post.id}
+						</div>
 						<div class="card-body">
 							<div class="card-meta-top">
-								<span class="card-tag">{post.tags[0] ?? post.id}</span>
-								<span class="card-read">{post.readMinutes} min read</span>
+								<span class="card-tag">{post.data.tags[0] ?? post.id}</span>
+								<span class="card-read">{readingMinutes(post.body)} min read</span>
 							</div>
-							<h3 class="card-title">{post.title}</h3>
-							<p class="card-desc">{post.description}</p>
+							<h3 class="card-title">{post.data.title}</h3>
+							<p class="card-desc">{post.data.description}</p>
 							<div class="card-extra">
 								<div class="card-extra-date">
-									<span class="avatar">{post.author.slice(0, 2).toUpperCase()}</span>
-									<span class="author">{post.author}</span>
+									<span class="avatar">{AUTHOR.slice(0, 2).toUpperCase()}</span>
+									<span class="author">{AUTHOR}</span>
 									<span class="dot">·</span>
-									<span>{fmtDate(post.pubDate)}</span>
+									<span>
+										<FormattedDate date={post.data.pubDate} />
+									</span>
 								</div>
 								<div class="card-extra-tags">
-									{post.tags.map((t) => <span class="chip">{t}</span>)}
+									{post.data.tags.map((t) => (
+										<span class="chip">{t}</span>
+									))}
 								</div>
 							</div>
 						</div>
 					</a>
-				))}
-			</div>
-		</main>
-		<Footer />
-	</body>
-</html>
+				))
+			}
+		</div>
+	</main>
+</BaseLayout>
+
+<style>
+	main {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 3em 1.5em 6em;
+	}
+
+	/* ── page head ── */
+	.page-head {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		grid-template-rows: auto auto;
+		align-items: center;
+		gap: 0.5rem 1rem;
+		padding: 1em 0 2em;
+		border-bottom: 1px solid var(--border);
+		margin-bottom: 2em;
+	}
+	.page-head h1 {
+		grid-column: 1;
+		grid-row: 1;
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: clamp(2.25rem, 5vw, 3.25rem);
+		line-height: 1;
+		margin: 0;
+		letter-spacing: -0.02em;
+		color: rgb(var(--black));
+	}
+	.page-head .sub {
+		grid-column: 1;
+		grid-row: 2;
+		margin: 0;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+	.sub a {
+		color: var(--accent);
+		font-weight: 600;
+	}
+	.sub a:hover {
+		text-decoration: underline;
+	}
+	.read-hint {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+		background: rgb(var(--black));
+		color: rgb(var(--contrast-fg));
+		font-size: 0.78rem;
+		padding: 0.4rem 0.9rem;
+		border-radius: 999px;
+		justify-self: end;
+		align-self: center;
+		white-space: nowrap;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+	}
+
+	/* ── featured ── */
+	.featured {
+		padding: 0.5em 0 2em;
+		cursor: pointer;
+		border-bottom: 1px solid var(--border);
+		margin-bottom: 1.5em;
+	}
+	.featured-label {
+		color: #e63946;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.22em;
+		display: inline-block;
+		margin-bottom: 0.6rem;
+	}
+	.featured-title {
+		font-family: var(--font-atkinson), system-ui, sans-serif;
+		font-size: clamp(1.85rem, 4vw, 2.5rem);
+		line-height: 1.15;
+		margin: 0 0 0.75rem;
+		color: rgb(var(--black));
+		letter-spacing: -0.01em;
+		font-weight: 700;
+	}
+	.featured-desc {
+		color: rgb(var(--gray));
+		margin: 0 0 1rem;
+		max-width: 640px;
+		line-height: 1.55;
+		font-size: 1rem;
+	}
+	.featured .byline {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		font-size: 0.85rem;
+		color: rgb(var(--gray));
+	}
+	.read-link {
+		margin-left: 0.5rem;
+		color: var(--accent);
+		font-weight: 600;
+		text-decoration: none;
+		font-size: 0.9rem;
+	}
+	.read-link:hover { text-decoration: underline; }
+	.dot { color: rgb(var(--gray)); }
+
+	.avatar {
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		background: #e63946;
+		color: white;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.7rem;
+		font-weight: 700;
+	}
+
+	/* ── cards ── */
+	.cards {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+	.card {
+		display: flex;
+		gap: 1.25rem;
+		padding: 1.25rem;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		background: var(--bg-surface);
+		cursor: pointer;
+		transition: box-shadow 200ms ease, transform 200ms ease;
+	}
+	.card:hover {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+		transform: translateY(-1px);
+	}
+	.card-thumb {
+		flex: 0 0 80px;
+		width: 80px;
+		height: 80px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-weight: 700;
+		font-size: 0.72rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		text-align: center;
+		padding: 0.5rem;
+		line-height: 1.15;
+		word-break: break-word;
+	}
+	.card-body {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		min-width: 0;
+	}
+	.card-meta-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 0.78rem;
+		color: rgb(var(--gray));
+	}
+	.card-tag {
+		background: var(--accent-tint);
+		color: var(--accent);
+		padding: 0.2rem 0.6rem;
+		border-radius: 4px;
+		font-weight: 700;
+		font-size: 0.7rem;
+		letter-spacing: 0.02em;
+	}
+	.card-read { white-space: nowrap; }
+	.card-title {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: 1.3rem;
+		line-height: 1.2;
+		margin: 0.15rem 0;
+		color: rgb(var(--black));
+		letter-spacing: -0.01em;
+	}
+	.card-desc {
+		color: rgb(var(--gray));
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.5;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.card-footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		margin-top: 0.4rem;
+		flex-wrap: wrap;
+	}
+	.byline-mini {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		font-size: 0.82rem;
+		color: rgb(var(--gray));
+	}
+	.byline-mini .author {
+		color: rgb(var(--black));
+		font-weight: 600;
+	}
+	.chips {
+		display: flex;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+	}
+	.chip {
+		font-size: 0.7rem;
+		font-weight: 600;
+		padding: 0.25rem 0.6rem;
+		border-radius: 4px;
+		border: 1px solid var(--accent);
+		color: var(--accent);
+		background: var(--bg-surface);
+		transition: background 200ms ease, color 200ms ease;
+	}
+	.chip:hover {
+		background: var(--accent);
+		color: rgb(var(--contrast-fg));
+	}
+	.chip.alt {
+		border-color: #e63946;
+		color: #e63946;
+	}
+	.chip.alt:hover {
+		background: #e63946;
+		color: white;
+	}
+
+	.byline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0 0 1.5rem;
+		padding-bottom: 1.25rem;
+		border-bottom: 1px solid rgb(var(--gray-light));
+		font-size: 0.85rem;
+		color: rgb(var(--gray));
+	}
+	.author {
+		color: rgb(var(--black));
+		font-weight: 600;
+	}
+
+	/* ── card hover reveal ──
+	   Each card now navigates straight to the article page; hovering
+	   just expands to show extra info (author, date, all tags) with a
+	   subtle lift + scale. Pure CSS, no JS. */
+	.card {
+		text-decoration: none;
+		color: inherit;
+		will-change: transform;
+	}
+	.card-extra {
+		max-height: 0;
+		opacity: 0;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 0;
+		transition: max-height 220ms ease, opacity 180ms ease,
+			margin-top 220ms ease;
+		pointer-events: none;
+	}
+	.card-extra-date {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: rgb(var(--gray));
+		font-size: 0.78rem;
+	}
+	.card-extra-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	.card:hover .card-extra,
+	.card:focus-visible .card-extra {
+		max-height: 120px;
+		opacity: 1;
+		margin-top: 0.5rem;
+		pointer-events: auto;
+	}
+	.card:hover,
+	.card:focus-visible {
+		transform: translateY(-3px) scale(1.015);
+		box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+	}
+	.card-desc {
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		display: -webkit-box;
+		overflow: hidden;
+		transition: -webkit-line-clamp 220ms ease;
+	}
+	.card:hover .card-desc,
+	.card:focus-visible .card-desc {
+		-webkit-line-clamp: 5;
+	}
+	@media (hover: none) {
+		/* Touch devices: always show extra info, no hover needed */
+		.card-extra {
+			max-height: 120px;
+			opacity: 1;
+			margin-top: 0.5rem;
+			pointer-events: auto;
+		}
+	}
+
+	@media (max-width: 720px) {
+		main { padding: 2em 1.25em 4em; }
+		.featured { padding: 0.5em 0 1.5em; }
+		.card {
+			flex-direction: column;
+			padding: 1rem;
+		}
+		.card-thumb {
+			width: 64px;
+			height: 64px;
+			flex-basis: 64px;
+		}
+		.card-title { font-size: 1.15rem; }
+		.dialog { padding: 1.75rem 1.5rem 1.5rem; }
+		.actions { flex-direction: column-reverse; align-items: stretch; }
+		.chips { justify-content: flex-end; }
+	}
+</style>

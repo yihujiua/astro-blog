@@ -1,24 +1,20 @@
 import rss from '@astrojs/rss';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-
-const modules = import.meta.glob('/src/content/blog/*.md', { eager: true });
+import { getSortedPosts } from '../utils/posts';
 
 export async function GET(context) {
-	const posts = Object.entries(modules).map(([path, mod]: [string, any]) => {
-		const rawFm = mod.frontmatter;
-		const fm: Record<string, unknown> = typeof rawFm === 'function' ? rawFm() : (rawFm ?? {});
-		const slug = path.split('/').pop()!.replace(/\.md$/, '');
-		return {
-			title: String(fm.title ?? ''),
-			description: String(fm.description ?? ''),
-			pubDate: new Date(String(fm.pubDate ?? Date.now())),
-			link: `${import.meta.env.BASE_URL}blog/${slug}/`,
-		};
-	});
+	const posts = await getSortedPosts();
 	return rss({
 		title: SITE_TITLE,
 		description: SITE_DESCRIPTION,
 		site: context.site,
-		items: posts,
+		items: posts.map((post) => ({
+			title: post.data.title,
+			description: post.data.description,
+			pubDate: post.data.pubDate,
+			link: `${import.meta.env.BASE_URL}blog/${post.id}/`,
+			categories: post.data.tags,
+		})),
+		customData: '<language>zh-cn</language>',
 	});
 }

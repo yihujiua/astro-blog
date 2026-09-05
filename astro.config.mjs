@@ -17,7 +17,8 @@ export default defineConfig({
 			provider: fontProviders.local(),
 			name: 'Atkinson',
 			cssVariable: '--font-atkinson',
-			fallbacks: ['sans-serif'],
+			// Atkinson 只有拉丁字形，中文需要体面的回退栈
+			fallbacks: ['PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'sans-serif'],
 			options: {
 				variants: [
 					{

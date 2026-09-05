@@ -1,6 +1,15 @@
 ---
+import { getCollection } from 'astro:content';
+import { allTags } from '../utils/posts';
+
 const today = new Date();
 const base = import.meta.env.BASE_URL;
+
+// “主题”列动态取站内真实存在的热门标签，避免链接失效
+const posts = await getCollection('blog', ({ data }) =>
+	import.meta.env.PROD ? !data.draft : true
+);
+const topTags = allTags(posts).slice(0, 4);
 ---
 
 <footer>
@@ -34,13 +43,14 @@ const base = import.meta.env.BASE_URL;
 					<h4 class="col-title">导航</h4>
 					<a href={base}>首页</a>
 					<a href={`${base}blog/`}>博客</a>
+					<a href={`${base}tags/`}>标签</a>
+					<a href={`${base}archive/`}>归档</a>
+					<a href={`${base}links/`}>友链</a>
 					<a href={`${base}about/`}>关于</a>
 				</div>
 				<div class="col">
 					<h4 class="col-title">主题</h4>
-					<a href={`${base}blog/?tag=ESP32`}>ESP32</a>
-					<a href={`${base}blog/?tag=AI`}>AI 管家</a>
-					<a href={`${base}blog/?tag=智能家居`}>智能家居</a>
+					{topTags.map(({ tag, count }) => <a href={`${base}tags/${tag}/`}>{tag} ({count})</a>)}
 				</div>
 				<div class="col">
 					<h4 class="col-title">链接</h4>
@@ -78,8 +88,8 @@ const base = import.meta.env.BASE_URL;
 	footer {
 		margin-top: 4em;
 		padding: 3em 1.5em 2em;
-		background: white;
-		border-top: 1px solid rgba(0, 0, 0, 0.08);
+		background: var(--bg-surface);
+		border-top: 1px solid var(--border);
 		color: rgb(var(--gray-dark));
 		font-family: var(--font-atkinson), system-ui, sans-serif;
 	}
@@ -137,7 +147,7 @@ const base = import.meta.env.BASE_URL;
 	.swatch {
 		width: 22px;
 		height: 22px;
-		border: 1px solid rgba(0, 0, 0, 0.12);
+		border: 1px solid var(--border);
 		border-radius: 50%;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 	}
@@ -173,7 +183,7 @@ const base = import.meta.env.BASE_URL;
 	/* ── Divider ── */
 	.divider {
 		margin: 2.5rem 0 1.5rem;
-		border-top: 1px solid rgba(0, 0, 0, 0.08);
+		border-top: 1px solid var(--border);
 	}
 
 	/* ── Bottom: signature + back button ── */
@@ -217,13 +227,12 @@ const base = import.meta.env.BASE_URL;
 		padding: 0.55rem 1.1rem;
 		border: 1.5px solid rgb(var(--black));
 		border-radius: 6px;
-		background: white;
+		background: var(--bg-surface);
 		transition: all 200ms ease;
 	}
 	.back-btn:hover {
 		background: var(--accent);
-		border-color: var(--accent);
-		color: white;
+		color: rgb(var(--contrast-fg));
 		transform: translateY(-1px);
 	}
 

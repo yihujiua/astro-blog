@@ -1,18 +1,15 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 const base = import.meta.env.BASE_URL;
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<style>
 			.page {
 				position: relative;
-				min-height: 100vh;
+				min-height: calc(100vh - 4em); /* 全屏 Hero，扣除顶栏高度 */
 				display: flex;
 				flex-direction: column;
 				align-items: center;
@@ -64,6 +61,22 @@ const base = import.meta.env.BASE_URL;
 			.page::after {
 				bottom: 0;
 				background: linear-gradient(0deg, rgba(245, 239, 225, 0.4) 0%, rgba(245, 239, 225, 0) 100%);
+			}
+			/* 暗色：纸色光带换成深色，金色线稿压暗呈粉笔质感 */
+			:global(html[data-theme='dark']) .page::before {
+				background: linear-gradient(180deg, rgba(30, 30, 26, 0.55) 0%, rgba(30, 30, 26, 0) 100%);
+			}
+			:global(html[data-theme='dark']) .page::after {
+				background: linear-gradient(0deg, rgba(30, 30, 26, 0.45) 0%, rgba(30, 30, 26, 0) 100%);
+			}
+			:global(html[data-theme='dark']) .bg-center {
+				opacity: 0.12;
+			}
+			:global(html[data-theme='dark']) .bg-tl,
+			:global(html[data-theme='dark']) .bg-tr,
+			:global(html[data-theme='dark']) .bg-bl,
+			:global(html[data-theme='dark']) .bg-br {
+				opacity: 0.6;
 			}
 
 			/* ensure content sits above the deco */
@@ -131,13 +144,12 @@ const base = import.meta.env.BASE_URL;
 			}
 			.btn-primary {
 				background: rgb(var(--black));
-				color: white;
+				color: rgb(var(--contrast-fg));
 				border-color: rgb(var(--black));
 			}
 			.btn-primary:hover {
 				background: var(--accent);
-				border-color: var(--accent);
-				color: white;
+				color: rgb(var(--contrast-fg));
 				transform: translateY(-2px);
 			}
 			.btn-ghost {
@@ -147,7 +159,7 @@ const base = import.meta.env.BASE_URL;
 			}
 			.btn-ghost:hover {
 				background: rgb(var(--black));
-				color: white;
+				color: rgb(var(--contrast-fg));
 				transform: translateY(-2px);
 			}
 
@@ -165,7 +177,7 @@ const base = import.meta.env.BASE_URL;
 				--y0: 0px;
 				position: relative;
 				border: 1.5px dashed rgb(var(--black));
-				background: white;
+				background: var(--bg-surface);
 				padding: 1.25rem 0.75rem 0.9rem;
 				display: flex;
 				flex-direction: column;
@@ -231,6 +243,12 @@ const base = import.meta.env.BASE_URL;
 				letter-spacing: 0.05em;
 			}
 
+			@media (prefers-reduced-motion: reduce) {
+				.swatch-card:hover {
+					animation: none;
+				}
+			}
+
 			@media (max-width: 720px) {
 				.palette { grid-template-columns: repeat(3, 1fr); }
 				.bg-tl, .bg-tr { width: 130px; height: 130px; }
@@ -244,10 +262,9 @@ const base = import.meta.env.BASE_URL;
 				.bg-tl, .bg-tr, .bg-bl, .bg-br { width: 100px; height: 100px; }
 				.bg-center { display: none; }
 			}
-		</style>
-	</head>
-	<body>
-		<section class="page">
+	</style>
+
+	<section class="page">
 			<!-- Art Nouveau botanical background -->
 			<div class="bg-deco" aria-hidden="true">
 				<!-- center: soft sage organic halo + tiny gold flower -->
@@ -405,6 +422,5 @@ const base = import.meta.env.BASE_URL;
 					<span class="swatch-hex">#2337FF</span>
 				</div>
 			</div>
-		</section>
-	</body>
-</html>
+	</section>
+</BaseLayout>

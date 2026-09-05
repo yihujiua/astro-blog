@@ -1,0 +1,152 @@
+---
+import FormattedDate from '../../components/FormattedDate.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE_TITLE } from '../../consts';
+import { getSortedPosts, readingMinutes } from '../../utils/posts';
+
+export async function getStaticPaths() {
+	const posts = await getSortedPosts();
+	const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+	return tags.map((tag) => ({
+		params: { tag },
+		props: { posts: posts.filter((p) => p.data.tags.includes(tag)) },
+	}));
+}
+
+interface Props {
+	posts: Awaited<ReturnType<typeof getSortedPosts>>;
+}
+
+const { posts } = Astro.props;
+const tag = Astro.params.tag!;
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={`标签：${tag} — ${SITE_TITLE}`} description={`标签「${tag}」下的全部文章`}>
+	<main>
+		<section class="intro">
+			<p class="kicker">Tag — 标签</p>
+			<h1>#{tag}</h1>
+			<p>{posts.length} 篇文章 · <a href={`${base}tags/`}>全部标签 →</a></p>
+		</section>
+
+		<div class="cards">
+			{
+				posts.map((post) => (
+					<a class="card" href={`${base}blog/${post.id}/`}>
+						<div class="card-meta">
+							<span>
+								<FormattedDate date={post.data.pubDate} />
+							</span>
+							<span class="dot">·</span>
+							<span>{readingMinutes(post.body)} min read</span>
+						</div>
+						<h2 class="card-title">{post.data.title}</h2>
+						<p class="card-desc">{post.data.description}</p>
+					</a>
+				))
+			}
+		</div>
+
+		<a class="back" href={`${base}blog/`}>← 博客列表</a>
+	</main>
+</BaseLayout>
+
+<style>
+	main {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 3em 1em 4em;
+	}
+	.intro {
+		max-width: 640px;
+		margin-bottom: 2.5em;
+	}
+	.kicker {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 1rem;
+	}
+	.kicker::before {
+		content: '— ';
+	}
+	h1 {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: clamp(2.25rem, 5vw, 3rem);
+		line-height: 1.05;
+		margin: 0 0 1rem;
+		word-break: break-word;
+	}
+	.intro p {
+		color: rgb(var(--gray-dark));
+		line-height: 1.7;
+		margin: 0;
+	}
+	.intro a {
+		font-weight: 600;
+	}
+	.intro a:hover {
+		text-decoration: underline;
+	}
+
+	.cards {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		margin-bottom: 3rem;
+	}
+	.card {
+		display: block;
+		padding: 1.25rem;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		background: var(--bg-surface);
+		text-decoration: none;
+		color: inherit;
+		transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+	}
+	.card:hover {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+		transform: translateY(-2px);
+		border-color: var(--accent);
+	}
+	.card-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.78rem;
+		color: rgb(var(--gray));
+	}
+	.dot {
+		color: rgb(var(--gray-light));
+	}
+	.card-title {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: 1.3rem;
+		line-height: 1.2;
+		margin: 0.35rem 0;
+		color: rgb(var(--black));
+		letter-spacing: -0.01em;
+	}
+	.card-desc {
+		color: rgb(var(--gray));
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.5;
+	}
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		text-decoration: none;
+		color: rgb(var(--gray));
+		font-size: 0.875rem;
+	}
+	.back:hover {
+		color: var(--accent);
+	}
+</style>

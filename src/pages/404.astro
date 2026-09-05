@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={`404 — ${SITE_TITLE}`} description="页面不存在">
+	<main>
+		<section class="lost">
+			<!-- hand-drawn pencil squiggle -->
+			<svg class="doodle" viewBox="0 0 220 60" width="220" height="60" fill="none" aria-hidden="true">
+				<path
+					d="M8 40 Q 30 8, 55 34 T 105 30 T 155 36 T 212 26"
+					stroke="#e63946"
+					stroke-width="2"
+					stroke-linecap="round"
+				/>
+				<circle cx="212" cy="26" r="2.5" fill="#D4A24C" />
+				<path d="M70 46 q 6 6, 14 3 M130 48 q 8 4, 15 -1" stroke="#A8B89A" stroke-width="2" stroke-linecap="round" />
+			</svg>
+
+			<h1 class="code">404</h1>
+			<p class="msg">这一页迷路了 —— 它可能被移动、删除，或者从来就没存在过。</p>
+
+			<div class="cta-row">
+				<a class="btn btn-primary" href={base}>回首页</a>
+				<a class="btn btn-ghost" href={`${base}blog/`}>看博客</a>
+			</div>
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	main {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 3em 1.5em 5em;
+	}
+	.lost {
+		min-height: 60vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+	.doodle {
+		margin-bottom: 1rem;
+		opacity: 0.9;
+	}
+	.code {
+		font-family: ui-serif, Georgia, 'Times New Roman', serif;
+		font-size: clamp(4.5rem, 16vw, 8rem);
+		line-height: 1;
+		letter-spacing: -0.04em;
+		color: rgb(var(--black));
+		margin: 0 0 0.75rem;
+	}
+	.msg {
+		color: rgb(var(--gray));
+		font-size: 1rem;
+		line-height: 1.7;
+		max-width: 36ch;
+		margin: 0 0 2.5rem;
+	}
+
+	.cta-row {
+		display: flex;
+		gap: 0.85rem;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.9em 1.8em;
+		font-family: var(--font-atkinson), system-ui, sans-serif;
+		font-size: 0.95rem;
+		font-weight: 600;
+		text-decoration: none;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: all 220ms ease;
+		min-width: 160px;
+		border: 1.5px solid;
+	}
+	.btn-primary {
+		background: rgb(var(--black));
+		color: rgb(var(--contrast-fg));
+		border-color: rgb(var(--black));
+	}
+	.btn-primary:hover {
+		background: var(--accent);
+		color: rgb(var(--contrast-fg));
+		transform: translateY(-2px);
+	}
+	.btn-ghost {
+		background: transparent;
+		color: rgb(var(--black));
+		border-color: rgb(var(--black));
+	}
+	.btn-ghost:hover {
+		background: rgb(var(--black));
+		color: rgb(var(--contrast-fg));
+		transform: translateY(-2px);
+	}
+</style>
