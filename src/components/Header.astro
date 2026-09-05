@@ -9,8 +9,21 @@ import HeaderLink from './HeaderLink.astro';
 		<div class="internal-links">
 			<HeaderLink href="/">首页</HeaderLink>
 			<HeaderLink href="/blog">博客</HeaderLink>
+			<HeaderLink href="/archive">归档</HeaderLink>
 			<HeaderLink href="/links">友链</HeaderLink>
 			<HeaderLink href="/about">关于</HeaderLink>
+			<HeaderLink href="/search">搜索</HeaderLink>
+			<button id="theme-toggle" class="theme-toggle" aria-label="切换暗色模式" aria-pressed="false">
+				<!-- 月亮：亮色模式下显示，点击进入暗色 -->
+				<svg class="icon-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9Z" />
+				</svg>
+				<!-- 太阳：暗色模式下显示，点击回到亮色 -->
+				<svg class="icon-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+					<circle cx="12" cy="12" r="4" />
+					<path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5" />
+				</svg>
+			</button>
 		</div>
 	</nav>
 </header>
@@ -18,8 +31,8 @@ import HeaderLink from './HeaderLink.astro';
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: white;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+		background: var(--bg-surface);
+		border-bottom: 1px solid var(--border);
 		font-family: var(--font-atkinson), system-ui, sans-serif;
 	}
 	h2 {
@@ -43,7 +56,7 @@ import HeaderLink from './HeaderLink.astro';
 	}
 	nav a {
 		padding: 1em 0.5em;
-		color: var(--black);
+		color: rgb(var(--black));
 		border-bottom: 3px solid transparent;
 		text-decoration: none;
 		font-weight: 600;
@@ -57,4 +70,55 @@ import HeaderLink from './HeaderLink.astro';
 		color: var(--accent);
 		border-bottom-color: var(--accent);
 	}
+
+	.theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		margin-left: 0.35rem;
+		padding: 0;
+		border: 1.5px dashed rgb(var(--black));
+		border-radius: 50%;
+		background: transparent;
+		color: rgb(var(--black));
+		cursor: pointer;
+		vertical-align: middle;
+		transition: color 200ms ease, border-color 200ms ease, transform 200ms ease;
+	}
+	.theme-toggle:hover {
+		color: var(--accent);
+		border-color: var(--accent);
+		transform: rotate(15deg);
+	}
+	.icon-sun {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .icon-sun {
+		display: block;
+	}
+	:global(html[data-theme='dark']) .icon-moon {
+		display: none;
+	}
 </style>
+
+<script>
+	const toggle = document.getElementById('theme-toggle');
+	const root = document.documentElement;
+
+	function syncPressed() {
+		toggle?.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+	}
+	syncPressed();
+
+	toggle?.addEventListener('click', () => {
+		const dark = root.dataset.theme !== 'dark';
+		if (dark) root.dataset.theme = 'dark';
+		else delete root.dataset.theme;
+		try {
+			localStorage.setItem('theme', dark ? 'dark' : 'light');
+		} catch {}
+		syncPressed();
+	});
+</script>
