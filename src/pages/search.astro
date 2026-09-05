@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE } from '../consts';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={`搜索 — ${SITE_TITLE}`} description="搜索博客的全部文章">
+	<main>
+		<section class="intro">
+			<p class="kicker">Search — 搜索</p>
+			<h1>找点<em>什么</em></h1>
+			<p>输入关键词搜索全部文章，支持中文分词与代码片段。</p>
+		</section>
+
+		<div id="search"></div>
+		<p id="search-fallback" hidden>
+			搜索索引仅在构建后的站点中可用（本地 dev 模式不生成索引）。
+		</p>
+		<noscript><p class="noscript-hint">搜索需要启用 JavaScript。</p></noscript>
+	</main>
+</BaseLayout>
+
+<link rel="stylesheet" href={`${base}pagefind/pagefind-ui.css`} />
+<script is:inline src={`${base}pagefind/pagefind-ui.js`}></script>
+<script>
+	const mount = document.getElementById('search');
+	const fallback = document.getElementById('search-fallback');
+	// 索引由构建后置步骤（pagefind --site dist）生成，dev 下不存在
+	if (window.pagefind && mount) {
+		new window.pagefind.UI({
+			element: '#search',
+			showImages: false,
+			showSubResults: true,
+		});
+	} else if (fallback) {
+		fallback.hidden = false;
+	}
+</script>
+
+<style>
+	main {
+		max-width: 760px;
+		margin: 0 auto;
+		padding: 3em 1.5em 5em;
+	}
+	.intro {
+		max-width: 640px;
+		margin-bottom: 2.5em;
+	}
+	.kicker {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 1rem;
+	}
+	.kicker::before {
+		content: '— ';
+	}
+	h1 {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		line-height: 1.05;
+		margin: 0 0 1rem;
+	}
+	h1 em {
+		font-style: italic;
+		color: var(--accent);
+	}
+	.intro p {
+		color: rgb(var(--gray-dark));
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	#search-fallback,
+	.noscript-hint {
+		padding: 1rem 1.25rem;
+		border: 1px dashed rgb(var(--gray-light));
+		border-radius: 12px;
+		font-size: 0.88rem;
+		color: rgb(var(--gray));
+		line-height: 1.6;
+	}
+
+	/* Pagefind UI 配色对齐全站 */
+	:global(#search) {
+		--pagefind-ui-primary: #2337ff;
+		--pagefind-ui-text: rgb(var(--gray-dark));
+		--pagefind-ui-background: var(--bg-surface);
+		--pagefind-ui-border: rgb(var(--gray-light));
+		--pagefind-ui-tag: rgb(var(--gray-light));
+		--pagefind-ui-border-width: 1.5px;
+		--pagefind-ui-border-radius: 8px;
+		--pagefind-ui-font: var(--font-atkinson), system-ui, sans-serif;
+	}
+</style>

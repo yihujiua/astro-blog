@@ -1,0 +1,196 @@
+---
+import FormattedDate from '../components/FormattedDate.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_TITLE } from '../consts';
+import { getSortedPosts } from '../utils/posts';
+
+const base = import.meta.env.BASE_URL;
+const posts = await getSortedPosts();
+
+interface YearGroup {
+	year: number;
+	posts: typeof posts;
+}
+const byYear: YearGroup[] = [];
+for (const post of posts) {
+	const year = post.data.pubDate.getFullYear();
+	const group = byYear.find((g) => g.year === year);
+	if (group) group.posts.push(post);
+	else byYear.push({ year, posts: [post] });
+}
+---
+
+<BaseLayout title={`归档 — ${SITE_TITLE}`} description="按时间浏览全部文章">
+	<main>
+		<section class="intro">
+			<p class="kicker">Archive — 归档</p>
+			<h1>时间<em>线</em></h1>
+			<p>共 {posts.length} 篇文章，横跨 {byYear.length} 个年份。</p>
+		</section>
+
+		{
+			byYear.map(({ year, posts }) => (
+				<section class="year-section" aria-label={`${year} 年`}>
+					<div class="year-head">
+						<h2 class="year">{year}</h2>
+						<span class="year-rule" />
+						<span class="year-count">{posts.length} 篇</span>
+					</div>
+					<ul class="post-list">
+						{posts.map((post) => (
+							<li>
+								<a class="post-row" href={`${base}blog/${post.id}/`}>
+									<span class="post-date">
+										<FormattedDate date={post.data.pubDate} />
+									</span>
+												<span class="post-title">{post.data.title}</span>
+									{post.data.tags.length > 0 && (
+										<span class="post-tags">
+											{post.data.tags.map((t) => (
+												<span class="tag-chip">#{t}</span>
+											))}
+										</span>
+									)}
+								</a>
+							</li>
+						))}
+					</ul>
+				</section>
+			))
+		}
+	</main>
+</BaseLayout>
+
+<style>
+	main {
+		max-width: 860px;
+		margin: 0 auto;
+		padding: 3em 1em 4em;
+	}
+	.intro {
+		max-width: 640px;
+		margin-bottom: 2.5em;
+	}
+	.kicker {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 1rem;
+	}
+	.kicker::before {
+		content: '— ';
+	}
+	h1 {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		line-height: 1.05;
+		margin: 0 0 1rem;
+	}
+	h1 em {
+		font-style: italic;
+		color: var(--accent);
+	}
+	.intro p {
+		color: rgb(var(--gray-dark));
+		line-height: 1.7;
+		margin: 0;
+	}
+
+	.year-section {
+		margin-bottom: 2.5rem;
+	}
+	.year-head {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+	.year {
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: 1.6rem;
+		font-weight: 700;
+		color: rgb(var(--black));
+		margin: 0;
+	}
+	.year-rule {
+		flex: 1;
+		height: 1px;
+		background: rgb(var(--gray-light));
+	}
+	.year-count {
+		font-size: 0.78rem;
+		color: rgb(var(--gray));
+	}
+
+	.post-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	.post-row {
+		display: flex;
+		align-items: baseline;
+		gap: 1rem;
+		padding: 0.65rem 0.75rem;
+		margin: 0 0 0.35rem;
+		border-radius: 8px;
+		text-decoration: none;
+		color: inherit;
+		border: 1px solid transparent;
+		transition: background 180ms ease, border-color 180ms ease;
+	}
+	.post-row:hover {
+		background: var(--bg-surface);
+		border-color: var(--border);
+	}
+	.post-date {
+		flex: 0 0 6.5rem;
+		font-size: 0.8rem;
+		color: rgb(var(--gray));
+		white-space: nowrap;
+	}
+	.post-title {
+		flex: 1;
+		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-size: 1.02rem;
+		color: rgb(var(--black));
+		line-height: 1.4;
+	}
+	.post-row:hover .post-title {
+		color: var(--accent);
+	}
+	.post-tags {
+		display: flex;
+		gap: 0.35rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+	.tag-chip {
+		font-size: 0.7rem;
+		color: var(--accent);
+		background: var(--accent-tint);
+		padding: 0.15rem 0.5rem;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 720px) {
+		.post-row {
+			flex-wrap: wrap;
+			gap: 0.4rem 1rem;
+		}
+		.post-date {
+			flex-basis: auto;
+		}
+		.post-title {
+			flex-basis: 100%;
+			order: 2;
+		}
+		.post-tags {
+			order: 3;
+			justify-content: flex-start;
+		}
+	}
+</style>
