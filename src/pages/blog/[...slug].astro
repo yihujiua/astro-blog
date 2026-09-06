@@ -213,7 +213,7 @@ const toc: TocItem[] = flattenHeadings(headings)
 		margin-bottom: 2.5rem;
 	}
 	.back:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 
 	.hero {
@@ -222,8 +222,8 @@ const toc: TocItem[] = flattenHeadings(headings)
 	.hero img {
 		width: 100%;
 		height: auto;
-		border-radius: 12px;
-		box-shadow: var(--box-shadow);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow-sketch);
 	}
 
 	.tags {
@@ -236,15 +236,16 @@ const toc: TocItem[] = flattenHeadings(headings)
 		font-size: 0.72rem;
 		font-weight: 600;
 		padding: 0.3rem 0.75rem;
-		border-radius: 999px;
-		background: rgb(var(--gray-light));
-		color: rgb(var(--gray-dark));
+		border-radius: var(--radius);
+		border: 1.5px dashed var(--accent);
+		color: var(--accent-text);
 		text-decoration: none;
-		transition: background 180ms ease, color 180ms ease;
+		transition: background 150ms ease, color 150ms ease;
 	}
 	.tag:hover {
-		background: var(--accent);
-		color: rgb(var(--contrast-fg));
+		/* 铅笔涂黑 */
+		background: var(--pencil);
+		color: var(--paper);
 	}
 	h1 {
 		font-family: var(--font-serif);
@@ -303,7 +304,7 @@ const toc: TocItem[] = flattenHeadings(headings)
 	.prose :global(pre) {
 		background: rgb(var(--gray-light));
 		padding: 1.25em;
-		border-radius: 8px;
+		border-radius: var(--radius);
 		overflow-x: auto;
 		margin: 1.5em 0;
 	}
@@ -320,19 +321,18 @@ const toc: TocItem[] = flattenHeadings(headings)
 		align-self: start;
 	}
 	.toc-title {
-		font-family: var(--font-atkinson), system-ui, sans-serif;
-		font-size: 0.78rem;
+		font-family: var(--font-serif);
+		font-style: italic;
 		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
-		color: var(--accent);
+		font-size: 0.95rem;
+		color: var(--marker-text);
 		margin: 0 0 0.9rem;
 	}
 	.toc ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		border-left: 2px solid rgb(var(--gray-light));
+		border-left: 2px dashed var(--border-soft);
 	}
 	.toc li {
 		margin: 0;
@@ -341,22 +341,22 @@ const toc: TocItem[] = flattenHeadings(headings)
 		display: block;
 		padding: 0.35rem 0 0.35rem 0.9rem;
 		margin-left: -2px;
-		border-left: 2px solid transparent;
+		border-left: 2px dashed transparent;
 		color: rgb(var(--gray));
 		text-decoration: none;
 		font-size: 0.85rem;
 		line-height: 1.4;
-		transition: color 160ms ease, border-color 160ms ease;
+		transition: color 150ms ease, border-color 150ms ease;
 	}
 	.toc li.lvl-3 a {
 		padding-left: 1.9rem;
 		font-size: 0.8rem;
 	}
 	.toc a:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 	.toc a.active {
-		color: var(--accent);
+		color: var(--accent-text);
 		font-weight: 600;
 		border-left-color: var(--accent);
 	}
@@ -374,26 +374,28 @@ const toc: TocItem[] = flattenHeadings(headings)
 		flex-direction: column;
 		gap: 0.4rem;
 		padding: 1rem 1.15rem;
-		border: 1px solid var(--border);
-		border-radius: 12px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
 		background: var(--bg-surface);
 		text-decoration: none;
-		transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+		box-shadow: var(--shadow-sketch);
+		transition: box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease;
 	}
 	.nav-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(var(--gray), 15%);
-		border-color: var(--accent);
+		box-shadow: var(--shadow-sketch-hover);
+		border-color: var(--border);
+		transform: rotate(-0.4deg);
 	}
 	.nav-card.next {
 		align-items: flex-end;
 		text-align: right;
 	}
 	.nav-label {
-		font-size: 0.75rem;
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 0.85rem;
 		font-weight: 700;
-		color: var(--accent);
-		letter-spacing: 0.05em;
+		color: var(--marker-text);
 	}
 	.nav-title {
 		font-family: var(--font-serif);
@@ -406,7 +408,7 @@ const toc: TocItem[] = flattenHeadings(headings)
 	.related {
 		margin-top: 4rem;
 		padding-top: 2.5rem;
-		border-top: 1px solid var(--border);
+		border-top: 2px dashed var(--border-soft);
 	}
 	.related h2 {
 		font-family: var(--font-serif);
@@ -424,16 +426,17 @@ const toc: TocItem[] = flattenHeadings(headings)
 		flex-direction: column;
 		gap: 0.6rem;
 		padding: 1.1rem;
-		border: 1px solid var(--border);
-		border-radius: 12px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
 		background: var(--bg-surface);
 		text-decoration: none;
-		transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+		box-shadow: var(--shadow-sketch);
+		transition: box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease;
 	}
 	.rel-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(var(--gray), 15%);
-		border-color: var(--accent);
+		box-shadow: var(--shadow-sketch-hover);
+		border-color: var(--border);
+		transform: rotate(-0.5deg);
 	}
 	.rel-card h3 {
 		margin: 0;
@@ -452,9 +455,9 @@ const toc: TocItem[] = flattenHeadings(headings)
 		font-size: 0.68rem;
 		font-weight: 600;
 		padding: 0.2rem 0.55rem;
-		border-radius: 999px;
-		background: var(--accent-tint);
-		color: var(--accent);
+		border-radius: var(--radius);
+		border: 1.5px dashed var(--accent);
+		color: var(--accent-text);
 	}
 
 	@media (max-width: 980px) {

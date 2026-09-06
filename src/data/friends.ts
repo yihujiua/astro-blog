@@ -23,7 +23,7 @@ export const friendCategories: FriendCategory[] = [
 	{
 		key: 'tech',
 		label: '技术博客',
-		color: '#2A6F97',
+		color: '#3498DB',
 		links: [
 			{
 				name: 'Astro 官方',
@@ -45,7 +45,7 @@ export const friendCategories: FriendCategory[] = [
 	{
 		key: 'friends',
 		label: '朋友们',
-		color: '#e63946',
+		color: '#E74C3C',
 		links: [
 			{
 				name: '小明の博客',
@@ -62,7 +62,7 @@ export const friendCategories: FriendCategory[] = [
 	{
 		key: 'tools',
 		label: '工具 / 资源',
-		color: '#2D8659',
+		color: '#1E8449',
 		links: [
 			{
 				name: 'MDN Web Docs',

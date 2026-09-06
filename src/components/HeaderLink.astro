@@ -21,10 +21,29 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 <style>
 	a {
 		display: inline-block;
+		padding: 1em 0.5em;
+		color: rgb(var(--black));
 		text-decoration: none;
+		font-weight: 600;
+		transition: color 150ms ease;
 	}
+	a:hover {
+		color: var(--accent-text);
+	}
+	/* 手绘波浪下划线标记当前页 */
 	a.active {
-		font-weight: bolder;
-		text-decoration: underline;
+		color: var(--accent-text);
+		text-decoration: underline wavy var(--accent) 1.5px;
+		text-underline-offset: 5px;
+	}
+	@media (max-width: 720px) {
+		a {
+			width: 100%;
+			padding: 0.8em 0.25em;
+			border-bottom: 2px dashed var(--border-soft);
+		}
+		a:last-child {
+			border-bottom: none;
+		}
 	}
 </style>

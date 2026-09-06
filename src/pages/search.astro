@@ -48,22 +48,22 @@ const base = import.meta.env.BASE_URL;
 	#search-fallback,
 	.noscript-hint {
 		padding: 1rem 1.25rem;
-		border: 1px dashed rgb(var(--gray-light));
-		border-radius: 12px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
 		font-size: 0.88rem;
 		color: rgb(var(--gray));
 		line-height: 1.6;
 	}
 
-	/* Pagefind UI 配色对齐全站 */
+	/* Pagefind UI 配色对齐手绘风 */
 	:global(#search) {
-		--pagefind-ui-primary: #2337ff;
+		--pagefind-ui-primary: #3498db;
 		--pagefind-ui-text: rgb(var(--gray-dark));
 		--pagefind-ui-background: var(--bg-surface);
-		--pagefind-ui-border: rgb(var(--gray-light));
+		--pagefind-ui-border: rgba(44, 44, 44, 0.55);
 		--pagefind-ui-tag: rgb(var(--gray-light));
-		--pagefind-ui-border-width: 1.5px;
-		--pagefind-ui-border-radius: 8px;
+		--pagefind-ui-border-width: 2px;
+		--pagefind-ui-border-radius: 4px;
 		--pagefind-ui-font: var(--font-atkinson), system-ui, sans-serif;
 	}
 </style>

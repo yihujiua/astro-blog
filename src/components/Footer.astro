@@ -85,14 +85,14 @@ const topTags = allTags(posts).slice(0, 4);
 </footer>
 
 <style>
-	footer {
-		margin-top: 4em;
-		padding: 3em 1.5em 2em;
-		background: var(--bg-surface);
-		border-top: 1px solid var(--border);
-		color: rgb(var(--gray-dark));
-		font-family: var(--font-atkinson), system-ui, sans-serif;
-	}
+footer {
+	margin-top: 4em;
+	padding: 3em 1.5em 2em;
+	background: var(--paper-dark);
+	border-top: 2px dashed var(--border-soft);
+	color: rgb(var(--gray-dark));
+	font-family: var(--font-atkinson), system-ui, sans-serif;
+}
 
 	.footer-inner {
 		max-width: 1200px;
@@ -114,16 +114,16 @@ const topTags = allTags(posts).slice(0, 4);
 		gap: 0.6rem;
 		margin-bottom: 0.85rem;
 	}
-	.logo-mark {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border: 1.5px solid rgb(var(--black));
-		border-radius: 4px;
-		color: rgb(var(--black));
-	}
+.logo-mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 2px dashed rgb(var(--black));
+	border-radius: var(--radius);
+	color: rgb(var(--black));
+}
 	.brand-title {
 		font-family: var(--font-atkinson), system-ui, sans-serif;
 		font-size: 1.4rem;
@@ -147,9 +147,9 @@ const topTags = allTags(posts).slice(0, 4);
 	.swatch {
 		width: 22px;
 		height: 22px;
-		border: 1px solid var(--border);
+		border: 2px dashed var(--border-soft);
 		border-radius: 50%;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+		box-shadow: var(--shadow-sketch-sm);
 	}
 
 	/* Column lists */
@@ -158,15 +158,16 @@ const topTags = allTags(posts).slice(0, 4);
 		grid-template-columns: repeat(3, 1fr);
 		gap: 2rem;
 	}
-	.col-title {
-		font-family: var(--font-atkinson), system-ui, sans-serif;
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
-		margin: 0 0 0.9rem;
-		color: var(--accent);
-	}
+.col-title {
+	font-family: var(--font-serif);
+	font-style: italic;
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 0 0 0.9rem;
+	color: rgb(var(--black));
+	text-decoration: underline dashed var(--marker) 1.5px;
+	text-underline-offset: 5px;
+}
 	.col a {
 		display: block;
 		font-family: var(--font-atkinson), system-ui, sans-serif;
@@ -177,14 +178,14 @@ const topTags = allTags(posts).slice(0, 4);
 		transition: color 200ms ease;
 	}
 	.col a:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 
 	/* ── Divider ── */
-	.divider {
-		margin: 2.5rem 0 1.5rem;
-		border-top: 1px solid var(--border);
-	}
+.divider {
+	margin: 2.5rem 0 1.5rem;
+	border-top: 2px dashed var(--border-soft);
+}
 
 	/* ── Bottom: signature + back button ── */
 	.bottom {
@@ -203,7 +204,7 @@ const topTags = allTags(posts).slice(0, 4);
 		color: rgb(var(--gray));
 	}
 	.star {
-		color: #e63946;
+		color: var(--marker-text);
 		font-size: 0.85rem;
 	}
 	.sig-name {
@@ -215,26 +216,31 @@ const topTags = allTags(posts).slice(0, 4);
 		color: rgb(var(--gray));
 	}
 
-	.back-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-family: var(--font-atkinson), system-ui, sans-serif;
-		font-size: 0.92rem;
-		font-weight: 600;
-		text-decoration: none;
-		color: rgb(var(--black));
-		padding: 0.55rem 1.1rem;
-		border: 1.5px solid rgb(var(--black));
-		border-radius: 6px;
-		background: var(--bg-surface);
-		transition: all 200ms ease;
-	}
-	.back-btn:hover {
-		background: var(--accent);
-		color: rgb(var(--contrast-fg));
-		transform: translateY(-1px);
-	}
+.back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: var(--font-atkinson), system-ui, sans-serif;
+	font-size: 0.92rem;
+	font-weight: 600;
+	text-decoration: none;
+	color: rgb(var(--black));
+	padding: 0.55rem 1.1rem;
+	border: 2px dashed rgb(var(--black));
+	border-radius: var(--radius);
+	background: transparent;
+	transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+.back-btn:hover {
+	/* 铅笔涂黑 */
+	background: var(--pencil);
+	color: var(--paper);
+	border-style: solid;
+	transform: rotate(-0.8deg);
+}
+.back-btn:active {
+	transform: translateY(1px) rotate(0.8deg);
+}
 
 	.copy {
 		text-align: center;

@@ -67,17 +67,26 @@ const base = import.meta.env.BASE_URL;
 	.card {
 		display: block;
 		padding: 1.25rem;
-		border: 1px solid var(--border);
-		border-radius: 12px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
 		background: var(--bg-surface);
 		text-decoration: none;
 		color: inherit;
-		transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+		box-shadow: var(--shadow-sketch);
+		transform: rotate(-0.4deg);
+		transition: box-shadow 150ms ease, transform 150ms ease, border-color 150ms ease;
+	}
+	.card:nth-child(even) {
+		transform: rotate(0.4deg);
 	}
 	.card:hover {
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-		transform: translateY(-2px);
-		border-color: var(--accent);
+		box-shadow: var(--shadow-sketch-hover);
+		transform: rotate(0deg);
+		border-color: var(--border);
+	}
+	.card:hover .card-title {
+		text-decoration: underline wavy var(--accent) 1.5px;
+		text-underline-offset: 4px;
 	}
 	.card-meta {
 		display: flex;
@@ -113,6 +122,6 @@ const base = import.meta.env.BASE_URL;
 		font-size: 0.875rem;
 	}
 	.back:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 </style>

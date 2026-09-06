@@ -85,8 +85,8 @@ for (const post of posts) {
 	}
 	.year-rule {
 		flex: 1;
-		height: 1px;
-		background: rgb(var(--gray-light));
+		height: 0;
+		border-top: 2px dashed var(--border-soft);
 	}
 	.year-count {
 		font-size: 0.78rem;
@@ -104,15 +104,16 @@ for (const post of posts) {
 		gap: 1rem;
 		padding: 0.65rem 0.75rem;
 		margin: 0 0 0.35rem;
-		border-radius: 8px;
+		border-radius: var(--radius);
 		text-decoration: none;
 		color: inherit;
-		border: 1px solid transparent;
-		transition: background 180ms ease, border-color 180ms ease;
+		border: 2px dashed transparent;
+		transition: background 150ms ease, border-color 150ms ease;
 	}
 	.post-row:hover {
 		background: var(--bg-surface);
-		border-color: var(--border);
+		border-color: var(--border-soft);
+		box-shadow: var(--shadow-sketch-sm);
 	}
 	.post-date {
 		flex: 0 0 6.5rem;
@@ -128,7 +129,8 @@ for (const post of posts) {
 		line-height: 1.4;
 	}
 	.post-row:hover .post-title {
-		color: var(--accent);
+		text-decoration: underline wavy var(--accent) 1.5px;
+		text-underline-offset: 4px;
 	}
 	.post-tags {
 		display: flex;
@@ -138,10 +140,10 @@ for (const post of posts) {
 	}
 	.tag-chip {
 		font-size: 0.7rem;
-		color: var(--accent);
-		background: var(--accent-tint);
+		color: var(--accent-text);
+		border: 1.5px dashed var(--accent);
 		padding: 0.15rem 0.5rem;
-		border-radius: 999px;
+		border-radius: var(--radius);
 		white-space: nowrap;
 	}
 

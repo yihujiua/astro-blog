@@ -69,7 +69,7 @@ const rest = posts.filter((p) => p !== featured);
 		align-items: center;
 		gap: 0.5rem 1rem;
 		padding: 1em 0 2em;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 2px dashed var(--border-soft);
 		margin-bottom: 2em;
 	}
 	.page-head h1 {
@@ -90,7 +90,7 @@ const rest = posts.filter((p) => p !== featured);
 		font-size: 0.95rem;
 	}
 	.sub a {
-		color: var(--accent);
+		color: var(--accent-text);
 		font-weight: 600;
 	}
 	.sub a:hover {
@@ -99,34 +99,43 @@ const rest = posts.filter((p) => p !== featured);
 	.read-hint {
 		grid-column: 2;
 		grid-row: 1 / span 2;
-		background: rgb(var(--black));
-		color: rgb(var(--contrast-fg));
+		background: var(--pencil);
+		color: var(--paper);
 		font-size: 0.78rem;
 		padding: 0.4rem 0.9rem;
-		border-radius: 999px;
+		border-radius: var(--radius);
+		box-shadow: var(--shadow-sketch-sm);
 		justify-self: end;
 		align-self: center;
 		white-space: nowrap;
 		font-weight: 600;
-		letter-spacing: 0.02em;
+		transform: rotate(1deg);
 	}
 
 	/* ── featured ── */
 	.featured {
 		padding: 0.5em 0 2em;
 		cursor: pointer;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 2px dashed var(--border-soft);
 		margin-bottom: 1.5em;
 	}
+	/* 手绘印章标签 */
 	.featured-label {
-		color: #e63946;
-		font-family: var(--font-atkinson), system-ui, sans-serif;
-		font-size: 0.78rem;
+		color: var(--marker-text);
+		font-family: var(--font-serif);
+		font-style: italic;
 		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.22em;
+		font-size: 0.9rem;
 		display: inline-block;
 		margin-bottom: 0.6rem;
+		padding: 0.15rem 0.7rem;
+		border: 2px dashed var(--marker);
+		border-radius: var(--radius);
+		transform: rotate(-1deg);
+	}
+	.featured:hover .featured-title {
+		text-decoration: underline wavy var(--accent) 2px;
+		text-underline-offset: 6px;
 	}
 	.featured-title {
 		font-family: var(--font-atkinson), system-ui, sans-serif;
@@ -153,11 +162,11 @@ const rest = posts.filter((p) => p !== featured);
 		color: rgb(var(--gray));
 		margin: 0 0 1.5rem;
 		padding-bottom: 1.25rem;
-		border-bottom: 1px solid rgb(var(--gray-light));
+		border-bottom: 2px dashed var(--border-soft);
 	}
 	.read-link {
 		margin-left: 0.5rem;
-		color: var(--accent);
+		color: var(--accent-text);
 		font-weight: 600;
 		text-decoration: none;
 		font-size: 0.9rem;
@@ -171,9 +180,9 @@ const rest = posts.filter((p) => p !== featured);
 	.avatar {
 		width: 1.5rem;
 		height: 1.5rem;
-		border-radius: 50%;
-		background: #e63946;
-		color: white;
+		border-radius: var(--radius);
+		background: var(--marker);
+		color: var(--paper);
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;

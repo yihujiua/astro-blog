@@ -49,17 +49,25 @@ const tags = allTags(posts);
 		justify-content: space-between;
 		gap: 0.5rem;
 		padding: 0.9rem 1.1rem;
-		border: 1.5px dashed rgba(0, 0, 0, 0.25);
-		border-radius: 10px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
 		background: var(--bg-surface);
 		text-decoration: none;
-		box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.06);
-		transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+		box-shadow: var(--shadow-sketch);
+		transform: rotate(-0.5deg);
+		transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+	}
+	.tag-card:nth-child(even) {
+		transform: rotate(0.5deg);
 	}
 	.tag-card:hover {
-		transform: translateY(-3px) rotate(-0.6deg);
-		box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.12);
-		border-color: var(--accent);
+		transform: rotate(0deg);
+		box-shadow: var(--shadow-sketch-hover);
+		border-color: var(--border);
+	}
+	.tag-card:active {
+		box-shadow: var(--shadow-sketch-sm);
+		transform: translateY(1px);
 	}
 	.tag-name {
 		font-family: var(--font-serif);
@@ -74,7 +82,7 @@ const tags = allTags(posts);
 		color: rgb(var(--gray));
 		background: rgb(var(--gray-light));
 		padding: 0.2rem 0.55rem;
-		border-radius: 999px;
+		border-radius: var(--radius);
 	}
 
 	.back {
@@ -86,6 +94,6 @@ const tags = allTags(posts);
 		font-size: 0.875rem;
 	}
 	.back:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 </style>

@@ -26,14 +26,8 @@ const githubHandle = GITHUB_URL.replace('https://', '');
 				left: 50%;
 				top: 0;
 				bottom: 0;
-				width: 2px;
-				background: linear-gradient(
-					to bottom,
-					transparent,
-					rgb(var(--gray-light)) 8%,
-					rgb(var(--gray-light)) 92%,
-					transparent
-				);
+				width: 0;
+				border-left: 2px dashed var(--border-soft);
 				transform: translateX(-50%);
 			}
 
@@ -46,12 +40,13 @@ const githubHandle = GITHUB_URL.replace('https://', '');
 
 			.card {
 				background: var(--bg-surface);
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 12px;
+				border: 2px dashed var(--border-soft);
+				border-radius: var(--radius);
 				padding: 1rem 1.25rem;
 				position: relative;
-				transition: transform 200ms ease, box-shadow 200ms ease,
-					border-color 200ms ease;
+				box-shadow: var(--shadow-sketch);
+				transition: box-shadow 150ms ease, transform 150ms ease,
+					border-color 150ms ease;
 			}
 
 			.event.left .card {
@@ -95,8 +90,9 @@ const githubHandle = GITHUB_URL.replace('https://', '');
 			}
 
 			.event:hover .card {
-				transform: translateY(-2px);
-				box-shadow: 0 8px 24px rgba(var(--gray), 15%);
+				box-shadow: var(--shadow-sketch-hover);
+				border-color: var(--border);
+				transform: rotate(-0.5deg);
 			}
 			.event:hover .node {
 				box-shadow: 0 0 0 4px var(--bg-page), 0 0 0 6px rgb(var(--gray-light));
@@ -107,15 +103,16 @@ const githubHandle = GITHUB_URL.replace('https://', '');
 			}
 
 			.event.highlight .card {
-				border-color: var(--accent);
-				box-shadow: 0 0 0 1px var(--accent), 0 8px 24px rgba(37, 99, 235, 12%);
+				border-color: var(--marker);
+				border-style: dashed;
+				box-shadow: var(--shadow-sketch-hover);
 			}
 
 			.cat {
-				font-size: 0.7rem;
+				font-family: var(--font-serif);
+				font-style: italic;
+				font-size: 0.8rem;
 				font-weight: 700;
-				text-transform: uppercase;
-				letter-spacing: 0.12em;
 				margin: 0;
 			}
 			.title {
@@ -191,10 +188,10 @@ const githubHandle = GITHUB_URL.replace('https://', '');
 			.contact {
 				margin-top: 3rem;
 				padding: 1.5rem;
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 12px;
-				background: linear-gradient(var(--gray-gradient)) no-repeat;
-				background-size: 100% 600px;
+				border: 2px dashed var(--border-soft);
+				border-radius: var(--radius);
+				background: var(--bg-surface);
+				box-shadow: var(--shadow-sketch);
 			}
 			.contact p {
 				margin: 0 0 0.5rem;

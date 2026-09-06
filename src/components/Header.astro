@@ -42,7 +42,7 @@ import HeaderLink from './HeaderLink.astro';
 		margin: 0;
 		padding: 0 1em;
 		background: var(--bg-surface);
-		border-bottom: 1px solid var(--border);
+		border-bottom: 2px dashed var(--border-soft);
 		font-family: var(--font-atkinson), system-ui, sans-serif;
 	}
 	h2 {
@@ -57,7 +57,7 @@ import HeaderLink from './HeaderLink.astro';
 		color: rgb(var(--black));
 	}
 	h2 a:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 	nav {
 		display: flex;
@@ -72,22 +72,7 @@ import HeaderLink from './HeaderLink.astro';
 		display: flex;
 		align-items: center;
 	}
-	nav a {
-		padding: 1em 0.5em;
-		color: rgb(var(--black));
-		border-bottom: 3px solid transparent;
-		text-decoration: none;
-		font-weight: 600;
-		transition: color 200ms ease, border-color 200ms ease;
-	}
-	nav a:hover {
-		color: var(--accent);
-	}
-	nav a.active {
-		text-decoration: none;
-		color: var(--accent);
-		border-bottom-color: var(--accent);
-	}
+	/* 导航链接自身的样式在 HeaderLink.astro 中（子组件作用域） */
 
 	.nav-actions {
 		display: flex;
@@ -111,7 +96,7 @@ import HeaderLink from './HeaderLink.astro';
 		transition: color 200ms ease, border-color 200ms ease, transform 200ms ease;
 	}
 	.round-btn:hover {
-		color: var(--accent);
+		color: var(--accent-text);
 		border-color: var(--accent);
 		transform: rotate(15deg);
 	}
@@ -142,19 +127,12 @@ import HeaderLink from './HeaderLink.astro';
 			flex-direction: column;
 			align-items: stretch;
 			background: var(--bg-surface);
-			border-bottom: 1px solid var(--border);
-			box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+			border-bottom: 2px dashed var(--border-soft);
+			box-shadow: var(--shadow-sketch-lg);
 			padding: 0.25em 0.9em 0.9em;
 		}
 		header.menu-open .internal-links {
 			display: flex;
-		}
-		.internal-links a {
-			padding: 0.8em 0.25em;
-			border-bottom: 1px dashed var(--border);
-		}
-		.internal-links a:last-child {
-			border-bottom: none;
 		}
 		.nav-toggle {
 			display: inline-flex;

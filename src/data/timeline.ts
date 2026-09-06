@@ -13,10 +13,10 @@ export interface TimelineEvent {
 }
 
 export const categoryMeta: Record<TimelineCategory, { label: string; color: string }> = {
-	milestone: { label: 'Milestone', color: '#e11d48' },
-	feature: { label: 'Feature', color: '#2563eb' },
-	design: { label: 'Design', color: '#d97706' },
-	launch: { label: 'Launch', color: '#16a34a' },
+	milestone: { label: 'Milestone', color: '#C0392B' },
+	feature: { label: 'Feature', color: '#21618C' },
+	design: { label: 'Design', color: '#9C640C' },
+	launch: { label: 'Launch', color: '#1E8449' },
 };
 
 export const timelineEvents: TimelineEvent[] = [
