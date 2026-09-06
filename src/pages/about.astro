@@ -1,66 +1,11 @@
 ---
 import PageIntro from '../components/PageIntro.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { AUTHOR, GITHUB_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { categoryMeta, timelineEvents } from '../data/timeline';
 
 const base = import.meta.env.BASE_URL;
-
-type Category = 'milestone' | 'feature' | 'design' | 'launch';
-
-interface TimelineEvent {
-	category: Category;
-	title: string;
-	date: string;
-	description?: string;
-	highlight?: boolean;
-	side: 'left' | 'right';
-}
-
-const catMeta: Record<Category, { label: string; color: string }> = {
-	milestone: { label: 'Milestone', color: '#e11d48' },
-	feature: { label: 'Feature', color: '#2563eb' },
-	design: { label: 'Design', color: '#d97706' },
-	launch: { label: 'Launch', color: '#16a34a' },
-};
-
-const events: TimelineEvent[] = [
-	{
-		category: 'milestone',
-		title: '博客上线',
-		date: 'Aug 2026',
-		description: '用 Astro 搭建个人博客，部署到 GitHub Pages。',
-		highlight: true,
-		side: 'left',
-	},
-	{
-		category: 'launch',
-		title: 'AI 管家',
-		date: 'Aug 2026',
-		description: '本地 Docker 跑通 Ollama + Home Assistant，语音控全屋。',
-		side: 'right',
-	},
-	{
-		category: 'design',
-		title: '智能家居架构',
-		date: 'Jul 2026',
-		description: '规划 ESP32-S3 网关 + ESP32-C3 终端的分布式家庭自动化方案。',
-		side: 'left',
-	},
-	{
-		category: 'feature',
-		title: '深入嵌入式',
-		date: 'May 2026',
-		description: '从 Arduino 进阶到 ESP-IDF，玩转 FreeRTOS、低功耗与无线协议。',
-		side: 'right',
-	},
-	{
-		category: 'milestone',
-		title: 'Hello, World',
-		date: '很久以前',
-		description: '在编辑器里敲下第一行代码，从此入坑。',
-		side: 'left',
-	},
-];
+const githubHandle = GITHUB_URL.replace('https://', '');
 ---
 
 <BaseLayout title={`关于 · ${SITE_TITLE}`} description={SITE_DESCRIPTION}>
@@ -290,7 +235,7 @@ const events: TimelineEvent[] = [
 	<main>
 			<PageIntro kicker="About — 个人简介" title="我的折腾旅程" em="折腾">
 				<p>
-					你好，我是 <strong>yihujiua</strong> 👋。一个爱折腾的开发者，
+					你好，我是 <strong>{AUTHOR}</strong> 👋。一个爱折腾的开发者，
 					喜欢把脑子里的想法变成能跑的东西。
 					这里记录我在智能家居、嵌入式开发、AI 应用和开源工具上的实践笔记。
 				</p>
@@ -298,8 +243,8 @@ const events: TimelineEvent[] = [
 
 			<section class="timeline" aria-label="项目时间线">
 				{
-					events.map((ev) => {
-						const meta = catMeta[ev.category];
+				timelineEvents.map((ev) => {
+					const meta = categoryMeta[ev.category];
 						return (
 							<div
 								class:list={['event', ev.side, { highlight: ev.highlight }]}
@@ -322,8 +267,8 @@ const events: TimelineEvent[] = [
 				<p><strong>联系我 →</strong></p>
 				<p>
 					GitHub：
-					<a href="https://github.com/yihujiua" target="_blank" rel="noopener">
-						github.com/yihujiua
+					<a href={GITHUB_URL} target="_blank" rel="noopener">
+						{githubHandle}
 					</a>
 				</p>
 				<p>欢迎一起折腾、一起交流项目想法。</p>

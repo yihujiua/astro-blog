@@ -1,9 +1,11 @@
 ---
 import { getCollection } from 'astro:content';
+import { AUTHOR, EMAIL, GITHUB_URL, PALETTE } from '../consts';
 import { allTags } from '../utils/posts';
 
 const today = new Date();
 const base = import.meta.env.BASE_URL;
+const githubHandle = GITHUB_URL.replace('https://', '');
 
 // “主题”列动态取站内真实存在的热门标签，避免链接失效
 const posts = await getCollection('blog', ({ data }) =>
@@ -29,12 +31,9 @@ const topTags = allTags(posts).slice(0, 4);
 					<br />手绘风，保留一点不完美的温度。
 				</p>
 				<div class="palette" aria-label="主题色">
-					<span class="swatch" style="background:#2A2A2A" title="Pencil #2A2A2A"></span>
-					<span class="swatch" style="background:#F5EFE1" title="Paper #F5EFE1"></span>
-					<span class="swatch" style="background:#e63946" title="Marker #e63946"></span>
-					<span class="swatch" style="background:#2337ff" title="Accent #2337ff"></span>
-					<span class="swatch" style="background:#2A6F97" title="Ink #2A6F97"></span>
-					<span class="swatch" style="background:#2D8659" title="Leaf #2D8659"></span>
+					{PALETTE.map(({ name, hex }) => (
+						<span class="swatch" style={`background:${hex}`} title={`${name} ${hex}`} />
+					))}
 				</div>
 			</div>
 
@@ -54,9 +53,9 @@ const topTags = allTags(posts).slice(0, 4);
 				</div>
 				<div class="col">
 					<h4 class="col-title">链接</h4>
-					<a href="https://github.com/yihujiua" target="_blank" rel="noopener">GitHub ↗</a>
+					<a href={GITHUB_URL} target="_blank" rel="noopener">{githubHandle} ↗</a>
 					<a href={`${base}rss.xml`}>RSS 订阅</a>
-					<a href="mailto:hi@yihujiua.com">写信给我</a>
+					<a href={`mailto:${EMAIL}`}>写信给我</a>
 				</div>
 			</div>
 		</div>
@@ -67,7 +66,7 @@ const topTags = allTags(posts).slice(0, 4);
 			<div class="signature">
 				<span>Sketched for</span>
 				<span class="star" aria-hidden="true">✺</span>
-				<span class="sig-name">yihujiua</span>
+				<span class="sig-name">{AUTHOR}</span>
 				<span class="squiggle" aria-hidden="true">
 					<svg viewBox="0 0 40 8" width="32" height="6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
 						<path d="M2 4 Q 7 0, 12 4 T 22 4 T 32 4 T 38 4" />
@@ -80,7 +79,7 @@ const topTags = allTags(posts).slice(0, 4);
 			</a>
 		</div>
 
-		<p class="copy">© {today.getFullYear()} yihujiua · 保留所有权利</p>
+			<p class="copy">© {today.getFullYear()} {AUTHOR} · 保留所有权利</p>
 	</div>
 </footer>
 

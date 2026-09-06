@@ -1,14 +1,13 @@
 ---
 import FormattedDate from '../../components/FormattedDate.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import { getSortedPosts, readingMinutes } from '../../utils/posts';
 
 const base = import.meta.env.BASE_URL;
 const posts = await getSortedPosts();
 const featured = posts.find((p) => p.data.featured) ?? posts[0];
 const rest = posts.filter((p) => p !== featured);
-const AUTHOR = 'yihujiua';
 
 const PALETTE = ['#2A2A2A', '#2A6F97', '#E63946', '#2D8659', '#2337FF'];
 function thumbColor(seed: string): string {

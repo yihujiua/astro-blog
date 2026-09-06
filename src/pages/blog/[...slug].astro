@@ -4,6 +4,7 @@ import { render } from 'astro:content';
 import type { MarkdownHeading } from 'astro:content';
 import FormattedDate from '../../components/FormattedDate.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { AUTHOR } from '../../consts';
 import { getSortedPosts, relatedPosts } from '../../utils/posts';
 import type { Post } from '../../utils/posts';
 
@@ -38,7 +39,7 @@ const jsonLd = {
 	description,
 	datePublished: pubDate.toISOString(),
 	dateModified: (updatedDate ?? pubDate).toISOString(),
-	author: { '@type': 'Person', name: 'yihujiua' },
+		author: { '@type': 'Person', name: AUTHOR },
 	url: new URL(Astro.url.pathname, Astro.site).toString(),
 	...(heroImage && { image: new URL(heroImage.src, Astro.site).toString() }),
 };
