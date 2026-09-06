@@ -16,18 +16,26 @@ interface TocItem {
 
 export async function getStaticPaths() {
 	const posts = await getSortedPosts();
-	return posts.map((post) => ({
+	// 列表按新→旧排序：i-1 是更新的一篇，i+1 是更早的一篇
+	return posts.map((post, i) => ({
 		params: { slug: post.id },
-		props: { post, related: relatedPosts(post, posts) },
+		props: {
+			post,
+			related: relatedPosts(post, posts),
+			newer: posts[i - 1] ?? null,
+			older: posts[i + 1] ?? null,
+		},
 	}));
 }
 
 interface Props {
 	post: Post;
 	related: Post[];
+	newer: Post | null;
+	older: Post | null;
 }
 
-const { post, related } = Astro.props;
+const { post, related, newer, older } = Astro.props;
 const { title, description, pubDate, updatedDate, heroImage, tags } = post.data;
 const { Content, headings } = await render(post);
 const base = import.meta.env.BASE_URL;
@@ -98,6 +106,25 @@ const toc: TocItem[] = flattenHeadings(headings)
 				<article class="prose">
 					<Content />
 				</article>
+
+				{
+					(older || newer) && (
+						<nav class="post-nav" aria-label="上一篇下一篇">
+							{older && (
+								<a class="nav-card" href={`${base}blog/${older.id}/`}>
+									<span class="nav-label">← 上一篇</span>
+									<span class="nav-title">{older.data.title}</span>
+								</a>
+							)}
+							{newer && (
+								<a class="nav-card next" href={`${base}blog/${newer.id}/`}>
+									<span class="nav-label">下一篇 →</span>
+									<span class="nav-title">{newer.data.title}</span>
+								</a>
+							)}
+						</nav>
+					)
+				}
 
 				{
 					related.length > 0 && (
@@ -334,6 +361,47 @@ const toc: TocItem[] = flattenHeadings(headings)
 		border-left-color: var(--accent);
 	}
 
+	/* ── prev / next navigation ── */
+	.post-nav {
+		display: flex;
+		gap: 1rem;
+		margin-top: 3rem;
+	}
+	.nav-card {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		padding: 1rem 1.15rem;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		background: var(--bg-surface);
+		text-decoration: none;
+		transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+	}
+	.nav-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 24px rgba(var(--gray), 15%);
+		border-color: var(--accent);
+	}
+	.nav-card.next {
+		align-items: flex-end;
+		text-align: right;
+	}
+	.nav-label {
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--accent);
+		letter-spacing: 0.05em;
+	}
+	.nav-title {
+		font-family: var(--font-serif);
+		font-size: 0.95rem;
+		line-height: 1.4;
+		color: rgb(var(--black));
+	}
+
 	/* ── related articles ── */
 	.related {
 		margin-top: 4rem;
@@ -401,6 +469,9 @@ const toc: TocItem[] = flattenHeadings(headings)
 	@media (max-width: 600px) {
 		.shell {
 			padding: 1.25em 1.25em 4em;
+		}
+		.post-nav {
+			flex-direction: column-reverse;
 		}
 		.related-grid {
 			grid-template-columns: 1fr;

@@ -6,24 +6,34 @@ import HeaderLink from './HeaderLink.astro';
 <header>
 	<nav>
 		<h2><a href={import.meta.env.BASE_URL}>{SITE_TITLE}</a></h2>
-		<div class="internal-links">
-			<HeaderLink href="/">首页</HeaderLink>
-			<HeaderLink href="/blog">博客</HeaderLink>
-			<HeaderLink href="/archive">归档</HeaderLink>
-			<HeaderLink href="/links">友链</HeaderLink>
-			<HeaderLink href="/about">关于</HeaderLink>
-			<HeaderLink href="/search">搜索</HeaderLink>
-			<button id="theme-toggle" class="theme-toggle" aria-label="切换暗色模式" aria-pressed="false">
-				<!-- 月亮：亮色模式下显示，点击进入暗色 -->
-				<svg class="icon-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9Z" />
-				</svg>
-				<!-- 太阳：暗色模式下显示，点击回到亮色 -->
-				<svg class="icon-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
-					<circle cx="12" cy="12" r="4" />
-					<path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5" />
-				</svg>
-			</button>
+		<div class="nav-right">
+			<div class="internal-links">
+				<HeaderLink href="/">首页</HeaderLink>
+				<HeaderLink href="/blog">博客</HeaderLink>
+				<HeaderLink href="/archive">归档</HeaderLink>
+				<HeaderLink href="/links">友链</HeaderLink>
+				<HeaderLink href="/about">关于</HeaderLink>
+				<HeaderLink href="/search">搜索</HeaderLink>
+			</div>
+			<div class="nav-actions">
+				<button id="theme-toggle" class="round-btn" aria-label="切换暗色模式" aria-pressed="false">
+					<!-- 月亮：亮色模式下显示，点击进入暗色 -->
+					<svg class="icon-moon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M20 13A8 8 0 1 1 11 4a6.5 6.5 0 0 0 9 9Z" />
+					</svg>
+					<!-- 太阳：暗色模式下显示，点击回到亮色 -->
+					<svg class="icon-sun" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+						<circle cx="12" cy="12" r="4" />
+						<path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5" />
+					</svg>
+				</button>
+				<!-- 仅移动端显示的菜单开关 -->
+				<button id="nav-toggle" class="round-btn nav-toggle" aria-label="打开菜单" aria-expanded="false">
+					<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+						<path d="M4 7h16M4 12h16M4 17h16" />
+					</svg>
+				</button>
+			</div>
 		</div>
 	</nav>
 </header>
@@ -54,6 +64,14 @@ import HeaderLink from './HeaderLink.astro';
 		align-items: center;
 		justify-content: space-between;
 	}
+	.nav-right {
+		display: flex;
+		align-items: center;
+	}
+	.internal-links {
+		display: flex;
+		align-items: center;
+	}
 	nav a {
 		padding: 1em 0.5em;
 		color: rgb(var(--black));
@@ -71,13 +89,18 @@ import HeaderLink from './HeaderLink.astro';
 		border-bottom-color: var(--accent);
 	}
 
-	.theme-toggle {
+	.nav-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	/* 主题切换 / 菜单开关共用的手绘圆钮 */
+	.round-btn {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
 		width: 32px;
 		height: 32px;
-		margin-left: 0.35rem;
 		padding: 0;
 		border: 1.5px dashed rgb(var(--black));
 		border-radius: 50%;
@@ -87,10 +110,13 @@ import HeaderLink from './HeaderLink.astro';
 		vertical-align: middle;
 		transition: color 200ms ease, border-color 200ms ease, transform 200ms ease;
 	}
-	.theme-toggle:hover {
+	.round-btn:hover {
 		color: var(--accent);
 		border-color: var(--accent);
 		transform: rotate(15deg);
+	}
+	.nav-toggle {
+		display: none;
 	}
 	.icon-sun {
 		display: none;
@@ -101,12 +127,46 @@ import HeaderLink from './HeaderLink.astro';
 	:global(html[data-theme='dark']) .icon-moon {
 		display: none;
 	}
+
+	@media (max-width: 720px) {
+		header {
+			position: relative;
+			padding: 0 0.75em;
+		}
+		.internal-links {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			align-items: stretch;
+			background: var(--bg-surface);
+			border-bottom: 1px solid var(--border);
+			box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+			padding: 0.25em 0.9em 0.9em;
+		}
+		header.menu-open .internal-links {
+			display: flex;
+		}
+		.internal-links a {
+			padding: 0.8em 0.25em;
+			border-bottom: 1px dashed var(--border);
+		}
+		.internal-links a:last-child {
+			border-bottom: none;
+		}
+		.nav-toggle {
+			display: inline-flex;
+		}
+	}
 </style>
 
 <script>
-	const toggle = document.getElementById('theme-toggle');
 	const root = document.documentElement;
 
+	// ── 主题切换 ──
+	const toggle = document.getElementById('theme-toggle');
 	function syncPressed() {
 		toggle?.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
 	}
@@ -120,5 +180,24 @@ import HeaderLink from './HeaderLink.astro';
 			localStorage.setItem('theme', dark ? 'dark' : 'light');
 		} catch {}
 		syncPressed();
+	});
+
+	// ── 移动端菜单开关 ──
+	const headerEl = document.querySelector('header');
+	const navToggle = document.getElementById('nav-toggle');
+	function closeMenu() {
+		headerEl?.classList.remove('menu-open');
+		navToggle?.setAttribute('aria-expanded', 'false');
+		navToggle?.setAttribute('aria-label', '打开菜单');
+	}
+	navToggle?.addEventListener('click', () => {
+		const open = headerEl?.classList.toggle('menu-open');
+		navToggle.setAttribute('aria-expanded', String(!!open));
+		navToggle.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+	});
+	// 点击菜单里的链接后收起；Escape 也可关闭
+	document.querySelectorAll('.internal-links a').forEach((a) => a.addEventListener('click', closeMenu));
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') closeMenu();
 	});
 </script>

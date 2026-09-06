@@ -1,20 +1,22 @@
 ---
+import PostCard from '../components/PostCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getSortedPosts } from '../utils/posts';
 
 const base = import.meta.env.BASE_URL;
+const latest = (await getSortedPosts()).slice(0, 3);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
 	<style>
 			.page {
 				position: relative;
-				min-height: calc(100vh - 4em); /* 全屏 Hero，扣除顶栏高度 */
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				padding: 4rem 1.5rem;
+				padding: 6rem 1.5rem 5rem;
 				text-align: center;
 				max-width: 100%;
 				overflow: hidden;
@@ -125,107 +127,50 @@ const base = import.meta.env.BASE_URL;
 				gap: 0.85rem;
 				justify-content: center;
 				flex-wrap: wrap;
-				margin-bottom: 3.5rem;
+				margin-bottom: 0;
 			}
 
-			/* ── color palette (5 dashed-border cards) ── */
-			.palette {
-				display: grid;
-				grid-template-columns: repeat(6, 1fr);
-				gap: 0.85rem;
-				padding: 1rem 0.5rem;
-				width: 100%;
-				max-width: 780px;
+			/* ── latest posts ── */
+			.latest {
+				max-width: 760px;
+				margin: 0 auto;
+				padding: 0 1.5rem 5.5rem;
 			}
-			.swatch-card {
-				--rot: 0deg;
-				--y0: 0px;
-				position: relative;
-				border: 1.5px dashed rgb(var(--black));
-				background: var(--bg-surface);
-				padding: 1.25rem 0.75rem 0.9rem;
+			.latest-head {
+				display: flex;
+				align-items: baseline;
+				justify-content: space-between;
+				gap: 1rem;
+				margin-bottom: 1.5rem;
+			}
+			.latest-head h2 {
+				font-family: var(--font-serif);
+				font-size: clamp(1.6rem, 4vw, 2rem);
+				margin: 0;
+				color: rgb(var(--black));
+			}
+			.more {
+				font-weight: 600;
+				font-size: 0.9rem;
+				white-space: nowrap;
+			}
+			.cards {
 				display: flex;
 				flex-direction: column;
-				align-items: center;
-				gap: 0.6rem;
-				transition: transform 220ms ease, box-shadow 220ms ease;
-				box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.08);
-				transform: rotate(var(--rot)) translateY(var(--y0));
-			}
-			.swatch-card:nth-child(1) { --rot: -2.5deg; --y0: -4px; }
-			.swatch-card:nth-child(2) { --rot:  1.8deg; --y0:  6px; }
-			.swatch-card:nth-child(3) { --rot: -1.2deg; --y0: -2px; }
-			.swatch-card:nth-child(4) { --rot:  2.6deg; --y0:  4px; }
-			.swatch-card:nth-child(5) { --rot: -2deg;   --y0: -5px; }
-			.swatch-card:nth-child(6) { --rot:  1.5deg; --y0: -3px; }
-			.swatch-card:hover {
-				transform: rotate(var(--rot)) translateY(var(--y0)) scale(1.08);
-				box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.18);
-				animation: jiggle 0.55s ease-in-out;
-			}
-			@keyframes jiggle {
-				0%   { translate: 0 0; }
-				15%  { translate: -3px -2px; }
-				30%  { translate: 3px  1px; }
-				45%  { translate: -2px  2px; }
-				60%  { translate:  2px -1px; }
-				75%  { translate: -1px  1px; }
-				100% { translate: 0 0; }
-			}
-			.swatch-card::before {
-				content: '';
-				position: absolute;
-				top: -15px;
-				left: 50%;
-				transform: translateX(-50%);
-				width: 18px;
-				height: 26px;
-				background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2034'%3E%3Cpath%20d='M12%2012.5%20L12.8%2030'%20stroke='%232A2A2A'%20stroke-width='1.6'%20stroke-linecap='round'%20fill='none'/%3E%3Cpath%20d='M12%202.5%20C15.5%202%2018.5%204.5%2018%208.5%20C17.6%2012%2015%2013.5%2012%2013.5%20C9%2013.5%206.5%2011.8%206.2%208.5%20C5.8%204.8%208.5%203%2012%202.5%20Z'%20fill='%23E63946'%20stroke='%232A2A2A'%20stroke-width='1.6'%20stroke-linejoin='round'/%3E%3Ccircle%20cx='9.5'%20cy='6'%20r='1.5'%20fill='%23ffffff'%20opacity='0.55'/%3E%3C/svg%3E");
-				background-size: contain;
-				background-repeat: no-repeat;
-				background-position: center;
-				transition: transform 220ms ease;
-			}
-			.swatch-card:hover::before { transform: translateX(-50%) rotate(-14deg); }
-			.swatch {
-				width: 56px;
-				height: 56px;
-				border-radius: 50%;
-				border: 1.5px solid rgba(0, 0, 0, 0.15);
-				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-			}
-			.swatch-label {
-				font-family: var(--font-atkinson), system-ui, sans-serif;
-				font-size: 0.72rem;
-				font-weight: 600;
-				color: rgb(var(--black));
-				letter-spacing: 0.04em;
-			}
-			.swatch-hex {
-				font-family: var(--font-mono);
-				font-size: 0.65rem;
-				color: rgb(var(--gray));
-				letter-spacing: 0.05em;
-			}
-
-			@media (prefers-reduced-motion: reduce) {
-				.swatch-card:hover {
-					animation: none;
-				}
+				gap: 1.25rem;
 			}
 
 			@media (max-width: 720px) {
-				.palette { grid-template-columns: repeat(3, 1fr); }
 				.bg-tl, .bg-tr { width: 130px; height: 130px; }
 				.bg-bl, .bg-br { width: 130px; height: 130px; }
 				.bg-center { width: 360px; }
 			}
 			@media (max-width: 480px) {
-				.page { padding: 3rem 1.25rem; }
+				.page { padding: 4rem 1.25rem 3.5rem; }
 				.title { font-size: clamp(2.5rem, 11vw, 4rem); }
-				.palette { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
 				.bg-tl, .bg-tr, .bg-bl, .bg-br { width: 100px; height: 100px; }
 				.bg-center { display: none; }
+				.latest { padding: 0 1.25rem 4rem; }
 			}
 	</style>
 
@@ -354,38 +299,17 @@ const base = import.meta.env.BASE_URL;
 				<a class="btn btn-primary" href={`${base}blog/`}>我的博客</a>
 				<a class="btn btn-ghost" href={`${base}about/`}>关于我</a>
 			</div>
+	</section>
 
-			<div class="palette" role="list">
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#2a2a2a"></div>
-					<span class="swatch-label">Pencil</span>
-					<span class="swatch-hex">#2A2A2A</span>
-				</div>
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#f5efe1"></div>
-					<span class="swatch-label">Paper</span>
-					<span class="swatch-hex">#F5EFE1</span>
-				</div>
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#e63946"></div>
-					<span class="swatch-label">Marker</span>
-					<span class="swatch-hex">#E63946</span>
-				</div>
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#2a6f97"></div>
-					<span class="swatch-label">Ink</span>
-					<span class="swatch-hex">#2A6F97</span>
-				</div>
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#2d8659"></div>
-					<span class="swatch-label">Leaf</span>
-					<span class="swatch-hex">#2D8659</span>
-				</div>
-				<div class="swatch-card" role="listitem">
-					<div class="swatch" style="background:#2337ff"></div>
-					<span class="swatch-label">Accent</span>
-					<span class="swatch-hex">#2337FF</span>
-				</div>
-			</div>
+	<section class="latest" aria-label="最新文章">
+		<div class="latest-head">
+			<h2>最新文章</h2>
+			<a class="more" href={`${base}blog/`}>全部文章 →</a>
+		</div>
+		<div class="cards">
+			{latest.map((post) => (
+				<PostCard post={post} />
+			))}
+		</div>
 	</section>
 </BaseLayout>
