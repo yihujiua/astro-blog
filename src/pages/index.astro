@@ -66,6 +66,24 @@ const base = import.meta.env.BASE_URL;
 				transform: rotate(0.3deg);
 				transition: transform 150ms ease;
 			}
+			/* 盖在相框右上角的手绘印章 */
+			.stamp {
+				position: absolute;
+				top: -18px;
+				right: -12px;
+				transform: rotate(8deg);
+				border: 2px dashed var(--marker);
+				box-shadow: var(--shadow-sketch-sm);
+				border-radius: var(--radius);
+				background: var(--bg-surface);
+				color: var(--marker-text);
+				font-family: var(--font-serif);
+				font-style: italic;
+				font-weight: 700;
+				font-size: 0.95rem;
+				padding: 0.35rem 0.8rem;
+				white-space: nowrap;
+			}
 
 			.title {
 				font-family: var(--font-serif);
@@ -95,9 +113,40 @@ const base = import.meta.env.BASE_URL;
 				flex-wrap: wrap;
 			}
 
+			/* 免责告示牌 */
+			.disclaimer {
+				margin: 1.75rem auto 0;
+				max-width: 560px;
+				border: 1.5px dashed rgba(231, 76, 60, 0.55);
+				border-radius: var(--radius);
+				background: var(--bg-surface);
+				padding: 0.85rem 1.15rem;
+				transform: rotate(0.4deg);
+				text-align: left;
+			}
+			.disclaimer strong {
+				display: block;
+				font-family: var(--font-serif);
+				font-style: italic;
+				font-size: 0.88rem;
+				color: var(--marker-text);
+				margin-bottom: 0.3rem;
+			}
+			.disclaimer p {
+				margin: 0;
+				font-size: 0.8rem;
+				line-height: 1.65;
+				color: rgb(var(--gray));
+			}
+
 			@media (max-width: 720px) {
 				.frame {
 					padding: 2.75rem 1.5rem 2.25rem;
+				}
+				.stamp {
+					top: -14px;
+					right: -6px;
+					font-size: 0.85rem;
 				}
 			}
 			@media (max-width: 480px) {
@@ -109,6 +158,7 @@ const base = import.meta.env.BASE_URL;
 	<section class="page">
 		<span class="eyebrow">Sketch Style</span>
 		<div class="frame">
+			<span class="stamp">AI 全程操作</span>
 			<h1 class="title">
 				我的<em>折腾</em>笔记
 			</h1>
@@ -120,6 +170,13 @@ const base = import.meta.env.BASE_URL;
 				<a class="btn btn-primary" href={`${base}blog/`}>开始阅读</a>
 				<a class="btn btn-ghost" href={`${base}about/`}>关于我</a>
 			</div>
+		</div>
+		<div class="disclaimer">
+			<strong>免责声明</strong>
+			<p>
+				本站的代码与文章均由 AI 生成、AI 构建，可能存在错误或过时信息，仅供学习交流，不构成任何专业建议。
+				参考或执行文中方案前，请自行验证并评估风险；因使用本站内容产生的任何后果由使用者自行承担。
+			</p>
 		</div>
 	</section>
 </BaseLayout>
