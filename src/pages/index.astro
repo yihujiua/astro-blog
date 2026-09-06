@@ -19,45 +19,8 @@ const base = import.meta.env.BASE_URL;
 				max-width: 100%;
 				overflow: hidden;
 			}
-
-			/* ── Art Nouveau botanical background (4 corners + center halo) ── */
-			.bg-deco {
-				position: absolute;
-				inset: 0;
-				pointer-events: none;
-				z-index: 0;
-			}
-			.bg-deco > svg {
-				position: absolute;
-				pointer-events: none;
-			}
-			.bg-tl { top: 1.5rem; left: 1.5rem; width: 180px; height: 180px; }
-			.bg-tr { top: 1.5rem; right: 1.5rem; width: 180px; height: 180px; }
-			.bg-bl { bottom: 1.5rem; left: 1.5rem; width: 180px; height: 180px; }
-			.bg-br { bottom: 1.5rem; right: 1.5rem; width: 180px; height: 180px; }
-			.bg-center {
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				width: 480px;
-				max-width: 70vw;
-				opacity: 0.45;
-			}
-			/* 暗色：金色线稿压暗呈粉笔质感 */
-			:global(html[data-theme='dark']) .bg-center {
-				opacity: 0.12;
-			}
-			:global(html[data-theme='dark']) .bg-tl,
-			:global(html[data-theme='dark']) .bg-tr,
-			:global(html[data-theme='dark']) .bg-bl,
-			:global(html[data-theme='dark']) .bg-br {
-				opacity: 0.6;
-			}
-
-			/* ensure content sits above the deco */
 			.page > * { position: relative; z-index: 1; }
 
-			/* ── top label：手写标注（非 uppercase eyebrow）── */
 			.eyebrow {
 				display: inline-block;
 				margin-bottom: 1.75rem;
@@ -77,177 +40,86 @@ const base = import.meta.env.BASE_URL;
 					no-repeat center / contain;
 			}
 
-			/* ── main title ── */
+			/* 手绘相框：微倾斜的虚线卡片 + 顶部胶带，像贴在素描本上的一页 */
+			.frame {
+				position: relative;
+				border: 2px dashed rgb(var(--black));
+				border-radius: var(--radius);
+				box-shadow: var(--shadow-sketch-lg);
+				background: var(--bg-surface);
+				padding: 3.5rem 3rem 3rem;
+				max-width: 640px;
+				transform: rotate(-0.5deg);
+			}
+			.frame::before {
+				content: '';
+				position: absolute;
+				top: -14px;
+				left: 50%;
+				width: 96px;
+				height: 28px;
+				transform: translateX(-50%) rotate(-3deg);
+				background: rgba(212, 162, 76, 0.4);
+				border-radius: 2px;
+			}
+			.frame:hover {
+				transform: rotate(0.3deg);
+				transition: transform 150ms ease;
+			}
+
 			.title {
-				font-family: var(--font-atkinson), system-ui, sans-serif;
+				font-family: var(--font-serif);
 				font-weight: 700;
-				font-size: clamp(3rem, 9vw, 6rem);
-				line-height: 1;
+				font-size: clamp(2.6rem, 8vw, 5.2rem);
+				line-height: 1.12;
 				color: rgb(var(--black));
-				letter-spacing: -0.03em;
-				margin: 0 0 0.5em;
-				max-width: 18ch;
+				letter-spacing: -0.02em;
+				margin: 0 0 0.55em;
+				max-width: 16ch;
 			}
 			.title .em {
 				font-style: italic;
 				color: var(--accent-text);
 			}
-
-			/* ── subtitle ── */
 			.subtitle {
 				max-width: 52ch;
-				margin: 0 auto 3rem;
+				margin: 0 auto 2.25rem;
 				color: rgb(var(--gray));
 				font-size: 1.05rem;
 				line-height: 1.65;
 			}
-
-			/* ── buttons ── */
 			.cta-row {
 				display: flex;
 				gap: 0.85rem;
 				justify-content: center;
 				flex-wrap: wrap;
-				margin-bottom: 0;
 			}
 
 			@media (max-width: 720px) {
-				.bg-tl, .bg-tr { width: 130px; height: 130px; }
-				.bg-bl, .bg-br { width: 130px; height: 130px; }
-				.bg-center { width: 360px; }
+				.frame {
+					padding: 2.75rem 1.5rem 2.25rem;
+				}
 			}
 			@media (max-width: 480px) {
 				.page { padding: 3rem 1.25rem; }
-				.title { font-size: clamp(2.5rem, 11vw, 4rem); }
-				.bg-tl, .bg-tr, .bg-bl, .bg-br { width: 100px; height: 100px; }
-				.bg-center { display: none; }
+				.title { font-size: clamp(2.3rem, 11vw, 3.6rem); }
 			}
 	</style>
 
 	<section class="page">
-			<!-- Art Nouveau botanical background -->
-			<div class="bg-deco" aria-hidden="true">
-				<!-- center: soft sage organic halo + tiny gold flower -->
-				<svg class="bg-center" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M 240 60
-						   C 320 70, 380 130, 400 200
-						   C 420 270, 400 340, 340 390
-						   C 280 440, 200 440, 150 400
-						   C 90 360, 60 290, 80 220
-						   C 100 140, 160 70, 240 60 Z"
-						fill="#E8E4D5" />
-					<!-- tiny gold flower at the very top of the halo -->
-					<g transform="translate(240, 50)">
-						<circle r="14" fill="#D4A24C" />
-						<circle r="6" fill="#27AE60" />
-						<circle r="2" fill="#F5EFE1" />
-					</g>
-				</svg>
-
-				<!-- top-left: curved line + 3 leaves + dot -->
-				<svg class="bg-tl" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-					<!-- gold curving line forming L-shape frame -->
-					<path
-						d="M 10 30 Q 20 15, 40 12 T 80 14 Q 100 16, 115 28 T 150 60 Q 160 78, 168 100"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<path
-						d="M 10 30 Q 12 50, 14 80 T 22 130 Q 28 150, 40 168"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<!-- leaves -->
-					<g transform="translate(30, 30) rotate(-30)">
-						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
-					</g>
-					<g transform="translate(50, 22) rotate(-50)">
-						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
-					</g>
-					<g transform="translate(20, 60) rotate(20)">
-						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
-					</g>
-					<!-- small dots -->
-					<circle cx="100" cy="40" r="2" fill="#D4A24C" />
-					<circle cx="35" cy="100" r="2" fill="#D4A24C" />
-				</svg>
-
-				<!-- top-right: mirror of top-left -->
-				<svg class="bg-tr" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M 170 30 Q 160 15, 140 12 T 100 14 Q 80 16, 65 28 T 30 60 Q 20 78, 12 100"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<path
-						d="M 170 30 Q 168 50, 166 80 T 158 130 Q 152 150, 140 168"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<g transform="translate(150, 30) rotate(30)">
-						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
-					</g>
-					<g transform="translate(130, 22) rotate(50)">
-						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
-					</g>
-					<g transform="translate(160, 60) rotate(-20)">
-						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
-					</g>
-					<circle cx="80" cy="40" r="2" fill="#D4A24C" />
-					<circle cx="145" cy="100" r="2" fill="#D4A24C" />
-				</svg>
-
-				<!-- bottom-left: mirror flipped -->
-				<svg class="bg-bl" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M 10 150 Q 20 165, 40 168 T 80 166 Q 100 164, 115 152 T 150 120 Q 160 102, 168 80"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<path
-						d="M 10 150 Q 12 130, 14 100 T 22 50 Q 28 30, 40 12"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<g transform="translate(30, 150) rotate(30)">
-						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
-					</g>
-					<g transform="translate(50, 158) rotate(50)">
-						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
-					</g>
-					<g transform="translate(20, 120) rotate(-20)">
-						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
-					</g>
-					<circle cx="100" cy="140" r="2" fill="#D4A24C" />
-					<circle cx="35" cy="80" r="2" fill="#D4A24C" />
-				</svg>
-
-				<!-- bottom-right: mirror flipped -->
-				<svg class="bg-br" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-					<path
-						d="M 170 150 Q 160 165, 140 168 T 100 166 Q 80 164, 65 152 T 30 120 Q 20 102, 12 80"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<path
-						d="M 170 150 Q 168 130, 166 100 T 158 50 Q 152 30, 140 12"
-						stroke="#D4A24C" stroke-width="1.4" fill="none" stroke-linecap="round" />
-					<g transform="translate(150, 150) rotate(-30)">
-						<path d="M 0 0 Q 10 -4, 18 0 Q 10 8, 0 0 Z" fill="#A8B89A" opacity="0.85" />
-					</g>
-					<g transform="translate(130, 158) rotate(-50)">
-						<path d="M 0 0 Q 8 -3, 14 0 Q 8 6, 0 0 Z" fill="#A8B89A" opacity="0.7" />
-					</g>
-					<g transform="translate(160, 120) rotate(20)">
-						<path d="M 0 0 Q 9 -3, 16 0 Q 9 7, 0 0 Z" fill="#A8B89A" opacity="0.75" />
-					</g>
-					<circle cx="80" cy="140" r="2" fill="#D4A24C" />
-					<circle cx="145" cy="80" r="2" fill="#D4A24C" />
-				</svg>
-			</div>
-
-			<span class="eyebrow">Sketch Style</span>
-
+		<span class="eyebrow">Sketch Style</span>
+		<div class="frame">
 			<h1 class="title">
-				Every line<br />
-				tells a <span class="em">story</span>.
+				我的<em>折腾</em>笔记
 			</h1>
-
 			<p class="subtitle">
-				手绘风的边框、纸张的肌理、笔迹的温度。<br />
-				不完美的线条，却承载着想被你看见的那点心意。
+				智能家居、嵌入式、AI 管家——<br />
+				把脑子里的想法，变成能跑的东西。
 			</p>
-
 			<div class="cta-row">
-				<a class="btn btn-primary" href={`${base}blog/`}>我的博客</a>
+				<a class="btn btn-primary" href={`${base}blog/`}>开始阅读</a>
 				<a class="btn btn-ghost" href={`${base}about/`}>关于我</a>
 			</div>
+		</div>
 	</section>
 </BaseLayout>
