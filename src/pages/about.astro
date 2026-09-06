@@ -1,4 +1,5 @@
 ---
+import PageIntro from '../components/PageIntro.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -68,36 +69,6 @@ const events: TimelineEvent[] = [
 				max-width: 880px;
 				margin: 0 auto;
 				padding: 3em 1em 4em;
-			}
-			.intro {
-				max-width: 640px;
-				margin-bottom: 3em;
-			}
-			.kicker {
-				font-size: 0.8rem;
-				font-weight: 700;
-				letter-spacing: 0.15em;
-				text-transform: uppercase;
-				color: var(--accent);
-				margin: 0 0 1rem;
-			}
-			.kicker::before {
-				content: '— ';
-			}
-			h1 {
-				font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
-				font-size: clamp(2.5rem, 6vw, 3.5rem);
-				line-height: 1.05;
-				margin: 0 0 1rem;
-			}
-			h1 em {
-				font-style: italic;
-				color: var(--accent);
-			}
-			.intro p {
-				color: rgb(var(--gray-dark));
-				line-height: 1.7;
-				margin: 0 0 1rem;
 			}
 
 			.timeline {
@@ -317,15 +288,13 @@ const events: TimelineEvent[] = [
 	</style>
 
 	<main>
-			<section class="intro">
-				<p class="kicker">About — 个人简介</p>
-				<h1>我的<em>折腾</em>旅程</h1>
+			<PageIntro kicker="About — 个人简介" title="我的折腾旅程" em="折腾">
 				<p>
 					你好，我是 <strong>yihujiua</strong> 👋。一个爱折腾的开发者，
 					喜欢把脑子里的想法变成能跑的东西。
 					这里记录我在智能家居、嵌入式开发、AI 应用和开源工具上的实践笔记。
 				</p>
-			</section>
+			</PageIntro>
 
 			<section class="timeline" aria-label="项目时间线">
 				{

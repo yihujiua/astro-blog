@@ -10,7 +10,7 @@ export async function getSortedPosts(): Promise<Post[]> {
 	).sort((a, b) => +b.data.pubDate - +a.data.pubDate);
 }
 
-/** Rough reading time from raw markdown body (strip code/links/markup first). */
+/** 估算阅读时长：中文按字数（约 400 字/分钟）、拉丁文按词数（约 200 词/分钟）分别累计。 */
 export function readingMinutes(body: string | undefined): number {
 	const stripped = (body ?? '')
 		.replace(/```[\s\S]*?```/g, ' ')
@@ -18,8 +18,13 @@ export function readingMinutes(body: string | undefined): number {
 		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
 		.replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
 		.replace(/[#>*_\-]/g, ' ');
-	const words = stripped.trim().split(/\s+/).filter(Boolean).length;
-	return Math.max(1, Math.round(words / 280));
+	const cjkChars = (stripped.match(/[\u4e00-\u9fff]/g) ?? []).length;
+	const latinWords = stripped
+		.replace(/[\u4e00-\u9fff]/g, ' ')
+		.trim()
+		.split(/\s+/)
+		.filter(Boolean).length;
+	return Math.max(1, Math.round(cjkChars / 400 + latinWords / 200));
 }
 
 /** Up to `count` posts sharing the most tags; falls back to newest others. */

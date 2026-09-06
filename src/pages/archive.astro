@@ -1,5 +1,6 @@
 ---
 import FormattedDate from '../components/FormattedDate.astro';
+import PageIntro from '../components/PageIntro.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_TITLE } from '../consts';
 import { getSortedPosts } from '../utils/posts';
@@ -22,11 +23,9 @@ for (const post of posts) {
 
 <BaseLayout title={`归档 — ${SITE_TITLE}`} description="按时间浏览全部文章">
 	<main>
-		<section class="intro">
-			<p class="kicker">Archive — 归档</p>
-			<h1>时间<em>线</em></h1>
+		<PageIntro kicker="Archive — 归档" title="时间线" em="线">
 			<p>共 {posts.length} 篇文章，横跨 {byYear.length} 个年份。</p>
-		</section>
+		</PageIntro>
 
 		{
 			byYear.map(({ year, posts }) => (
@@ -67,36 +66,6 @@ for (const post of posts) {
 		margin: 0 auto;
 		padding: 3em 1em 4em;
 	}
-	.intro {
-		max-width: 640px;
-		margin-bottom: 2.5em;
-	}
-	.kicker {
-		font-size: 0.8rem;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		color: var(--accent);
-		margin: 0 0 1rem;
-	}
-	.kicker::before {
-		content: '— ';
-	}
-	h1 {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
-		font-size: clamp(2.5rem, 6vw, 3.5rem);
-		line-height: 1.05;
-		margin: 0 0 1rem;
-	}
-	h1 em {
-		font-style: italic;
-		color: var(--accent);
-	}
-	.intro p {
-		color: rgb(var(--gray-dark));
-		line-height: 1.7;
-		margin: 0;
-	}
 
 	.year-section {
 		margin-bottom: 2.5rem;
@@ -108,7 +77,7 @@ for (const post of posts) {
 		margin-bottom: 0.75rem;
 	}
 	.year {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: 1.6rem;
 		font-weight: 700;
 		color: rgb(var(--black));
@@ -153,7 +122,7 @@ for (const post of posts) {
 	}
 	.post-title {
 		flex: 1;
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: 1.02rem;
 		color: rgb(var(--black));
 		line-height: 1.4;

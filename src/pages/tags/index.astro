@@ -1,4 +1,5 @@
 ---
+import PageIntro from '../../components/PageIntro.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SITE_TITLE } from '../../consts';
 import { allTags, getSortedPosts } from '../../utils/posts';
@@ -10,11 +11,9 @@ const tags = allTags(posts);
 
 <BaseLayout title={`标签 — ${SITE_TITLE}`} description="按标签浏览全部文章">
 	<main>
-		<section class="intro">
-			<p class="kicker">Tags — 标签</p>
-			<h1>全部<em>标签</em></h1>
+		<PageIntro kicker="Tags — 标签" title="全部标签" em="标签">
 			<p>共 {tags.length} 个标签，{posts.length} 篇文章。点击标签查看对应文章。</p>
-		</section>
+		</PageIntro>
 
 		<div class="tag-grid">
 			{
@@ -36,36 +35,6 @@ const tags = allTags(posts);
 		max-width: 860px;
 		margin: 0 auto;
 		padding: 3em 1em 4em;
-	}
-	.intro {
-		max-width: 640px;
-		margin-bottom: 2.5em;
-	}
-	.kicker {
-		font-size: 0.8rem;
-		font-weight: 700;
-		letter-spacing: 0.15em;
-		text-transform: uppercase;
-		color: var(--accent);
-		margin: 0 0 1rem;
-	}
-	.kicker::before {
-		content: '— ';
-	}
-	h1 {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
-		font-size: clamp(2.5rem, 6vw, 3.5rem);
-		line-height: 1.05;
-		margin: 0 0 1rem;
-	}
-	h1 em {
-		font-style: italic;
-		color: var(--accent);
-	}
-	.intro p {
-		color: rgb(var(--gray-dark));
-		line-height: 1.7;
-		margin: 0;
 	}
 
 	.tag-grid {
@@ -93,7 +62,7 @@ const tags = allTags(posts);
 		border-color: var(--accent);
 	}
 	.tag-name {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-weight: 700;
 		color: rgb(var(--black));
 		font-size: 1rem;

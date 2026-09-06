@@ -1,0 +1,58 @@
+---
+interface Props {
+	/** 顶部小标签，如 “Archive — 归档” */
+	kicker: string;
+	/** 页面主标题 */
+	title: string;
+	/** title 中需要强调（斜体 + 主题色）的部分 */
+	em?: string;
+	/** 标题更紧凑，用于可能很长的标题（如 #标签名） */
+	compact?: boolean;
+}
+
+const { kicker, title, em, compact = false } = Astro.props;
+const parts = em && title.includes(em) ? title.split(em) : null;
+---
+
+<section class="intro" class:list={{ compact }}>
+	<p class="kicker">{kicker}</p>
+	<h1>{parts ? parts[0] : title}{parts && <em>{em}</em>}{parts?.[1]}</h1>
+	<slot />
+</section>
+
+<style>
+	.intro {
+		max-width: 640px;
+		margin-bottom: 2.5em;
+	}
+	.kicker {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		color: var(--accent);
+		margin: 0 0 1rem;
+	}
+	.kicker::before {
+		content: '— ';
+	}
+	h1 {
+		font-family: var(--font-serif);
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		line-height: 1.05;
+		margin: 0 0 1rem;
+		word-break: break-word;
+	}
+	.compact h1 {
+		font-size: clamp(2.25rem, 5vw, 3rem);
+	}
+	h1 em {
+		font-style: italic;
+		color: var(--accent);
+	}
+	.intro :global(p) {
+		color: rgb(var(--gray-dark));
+		line-height: 1.7;
+		margin: 0;
+	}
+</style>

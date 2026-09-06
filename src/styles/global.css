@@ -7,6 +7,9 @@
 :root {
 	--accent: #2337ff;
 	--accent-dark: #000d8a;
+	/* 全站字体栈只在这里定义一次 */
+	--font-serif: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
@@ -149,6 +152,43 @@ hr {
 	main {
 		padding: 1em;
 	}
+}
+
+/* ── 全站通用按钮（首页、404、风格指南共用）── */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.9em 1.8em;
+	font-family: var(--font-atkinson), system-ui, sans-serif;
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 220ms ease;
+	min-width: 160px;
+	border: 1.5px solid;
+}
+.btn-primary {
+	background: rgb(var(--black));
+	color: rgb(var(--contrast-fg));
+	border-color: rgb(var(--black));
+}
+.btn-primary:hover {
+	background: var(--accent);
+	color: rgb(var(--contrast-fg));
+	transform: translateY(-2px);
+}
+.btn-ghost {
+	background: transparent;
+	color: rgb(var(--black));
+	border-color: rgb(var(--black));
+}
+.btn-ghost:hover {
+	background: rgb(var(--black));
+	color: rgb(var(--contrast-fg));
+	transform: translateY(-2px);
 }
 
 .sr-only {

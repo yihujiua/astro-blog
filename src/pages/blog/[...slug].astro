@@ -219,7 +219,7 @@ const toc: TocItem[] = flattenHeadings(headings)
 		color: rgb(var(--contrast-fg));
 	}
 	h1 {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: clamp(1.75rem, 3.5vw, 2.5rem);
 		letter-spacing: -0.02em;
 		line-height: 1.15;
@@ -242,14 +242,14 @@ const toc: TocItem[] = flattenHeadings(headings)
 		font-size: 0.95rem;
 	}
 	.prose :global(h2) {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: 1.3rem;
 		margin: 2em 0 0.5em;
 		color: rgb(var(--black));
 		scroll-margin-top: 1.5rem;
 	}
 	.prose :global(h3) {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: 1.1rem;
 		margin: 1.6em 0 0.4em;
 		color: rgb(var(--black));
@@ -340,7 +340,7 @@ const toc: TocItem[] = flattenHeadings(headings)
 		border-top: 1px solid var(--border);
 	}
 	.related h2 {
-		font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
+		font-family: var(--font-serif);
 		font-size: 1.4rem;
 		margin: 0 0 1.5rem;
 		color: rgb(var(--black));

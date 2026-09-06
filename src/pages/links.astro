@@ -1,4 +1,5 @@
 ---
+import PageIntro from '../components/PageIntro.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
@@ -107,36 +108,6 @@ const initials = (name: string) =>
 				max-width: 960px;
 				margin: 0 auto;
 				padding: 3em 1em 4em;
-			}
-			.intro {
-				max-width: 640px;
-				margin-bottom: 3em;
-			}
-			.kicker {
-				font-size: 0.8rem;
-				font-weight: 700;
-				letter-spacing: 0.15em;
-				text-transform: uppercase;
-				color: var(--accent);
-				margin: 0 0 1rem;
-			}
-			.kicker::before {
-				content: '— ';
-			}
-			h1 {
-				font-family: ui-serif, Georgia, 'Times New Roman', 'Songti SC', 'SimSun', serif;
-				font-size: clamp(2.5rem, 6vw, 3.5rem);
-				line-height: 1.05;
-				margin: 0 0 1rem;
-			}
-			h1 em {
-				font-style: italic;
-				color: var(--accent);
-			}
-			.intro p {
-				color: rgb(var(--gray-dark));
-				line-height: 1.7;
-				margin: 0;
 			}
 
 			/* ── category section ── */
@@ -282,7 +253,7 @@ const initials = (name: string) =>
 				line-height: 1.6;
 			}
 			.hint code {
-				font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+				font-family: var(--font-mono);
 				font-size: 0.82em;
 				background: rgb(var(--gray-light));
 				padding: 0.1em 0.35em;
@@ -310,14 +281,12 @@ const initials = (name: string) =>
 	</style>
 
 	<main>
-			<section class="intro">
-				<p class="kicker">Links — 友链</p>
-				<h1>我收藏的<em>伙伴</em></h1>
+			<PageIntro kicker="Links — 友链" title="我收藏的伙伴" em="伙伴">
 				<p>
 					这里放着我常逛的技术博客、一起折腾的朋友，以及一些顺手的工具。
 					鼠标滑过卡片，看看它们是谁 👀。
 				</p>
-			</section>
+			</PageIntro>
 
 			{
 				categories.map((cat) => (
