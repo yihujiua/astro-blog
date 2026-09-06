@@ -12,6 +12,37 @@ const base = import.meta.env.BASE_URL;
 			<p>这一页汇总了全站共用的视觉元素：调色板、按钮与字体，方便随时查阅。</p>
 		</PageIntro>
 
+		<section class="block" aria-label="纸张背景">
+			<h2>纸张背景</h2>
+			<p class="block-note">候选方案预览——选定后应用到全站或仅首页。</p>
+			<div class="paper-grid">
+				<div class="paper-demo paper-a">
+					<strong>A · 素纸噪点</strong>
+					<span>现状：极淡铅笔噪点，最素净，突出内容</span>
+				</div>
+				<div class="paper-demo paper-b">
+					<strong>B · 方格素描纸</strong>
+					<span>方格本质感，结构感强，适合技术博客</span>
+				</div>
+				<div class="paper-demo paper-c">
+					<strong>C · 点阵纸</strong>
+					<span>手账点纸，轻盈规整，比方格更安静</span>
+				</div>
+				<div class="paper-demo paper-d">
+					<strong>D · 横线手账纸</strong>
+					<span>笔记本横线 + 红装订线，手绘感最浓</span>
+				</div>
+				<div class="paper-demo paper-e">
+					<strong>E · 牛皮纸</strong>
+					<span>更深的暖牛皮色，怀旧感强，对比更柔</span>
+				</div>
+				<div class="paper-demo paper-f">
+					<strong>F · 斜纹纤维纸</strong>
+					<span>细密斜纹模拟纸纤维，含蓄不抢戏</span>
+				</div>
+			</div>
+		</section>
+
 		<section class="block" aria-label="调色板">
 			<h2>调色板</h2>
 			<div class="palette" role="list">
@@ -68,6 +99,62 @@ const base = import.meta.env.BASE_URL;
 		font-size: 1.5rem;
 		color: rgb(var(--black));
 		margin: 0 0 1.5rem;
+	}
+
+	/* ── 纸张背景候选 ── */
+	.block-note {
+		font-size: 0.9rem;
+		color: rgb(var(--gray));
+		margin: -0.75rem 0 1.25rem;
+	}
+	.paper-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+	}
+	.paper-demo {
+		min-height: 150px;
+		border: 2px dashed var(--border-soft);
+		border-radius: var(--radius);
+		padding: 1rem 1.15rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		justify-content: center;
+	}
+	.paper-demo strong {
+		font-family: var(--font-serif);
+		font-size: 1.05rem;
+		color: rgb(var(--black));
+	}
+	.paper-demo span {
+		font-size: 0.82rem;
+		color: rgb(var(--gray));
+		line-height: 1.5;
+	}
+	.paper-a {
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+	}
+	.paper-b {
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M40 .5H0M.5 0V40' fill='none' stroke='%232c2c2c' stroke-opacity='0.08'/%3E%3C/svg%3E");
+	}
+	.paper-c {
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='2' cy='2' r='1.2' fill='%232c2c2c' fill-opacity='0.14'/%3E%3C/svg%3E");
+	}
+	.paper-d {
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='28'%3E%3Cpath d='M0 27.5H120' stroke='%232c2c2c' stroke-opacity='0.09'/%3E%3Cpath d='M24 0V28' stroke='%23e74c3c' stroke-opacity='0.3'/%3E%3C/svg%3E");
+	}
+	.paper-e {
+		background-color: #eadfc8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23m)' opacity='0.05'/%3E%3C/svg%3E");
+	}
+	.paper-f {
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Cpath d='M0 10L10 0' stroke='%232c2c2c' stroke-opacity='0.05'/%3E%3C/svg%3E");
 	}
 
 	/* ── 调色板：微倾斜的虚线卡片，悬停抖动 ── */

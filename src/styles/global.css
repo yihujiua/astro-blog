@@ -81,19 +81,23 @@
 	filter: brightness(0.88);
 }
 
-/* 纸张纹理：极淡的铅笔噪点，平铺全页（替代渐变光带） */
+/* 点阵纸：手账式圆点阵平铺全页（无渐变、无图片，内联 SVG pattern） */
 body {
 	font-family: var(--font-atkinson);
 	margin: 0;
 	padding: 0;
 	text-align: left;
 	background-color: var(--bg-page);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='2' cy='2' r='1.2' fill='%232c2c2c' fill-opacity='0.14'/%3E%3C/svg%3E");
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
 	font-size: 20px;
 	line-height: 1.7;
+}
+:root[data-theme='dark'] body {
+	/* 暗色牛皮纸上的暗点阵 */
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='2' cy='2' r='1.2' fill='%23ebe2d0' fill-opacity='0.1'/%3E%3C/svg%3E");
 }
 main {
 	width: 720px;
