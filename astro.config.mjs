@@ -8,9 +8,10 @@ import { defineConfig, fontProviders } from 'astro/config';
 // ⚠️ 部署前必改：
 //   site  = https://<你的GitHub用户名>.github.io
 //   base  = /<你的仓库名>/   （仓库名就是 GitHub 上那个项目名）
+// base 只在构建时生效（GitHub Pages 项目页）；开发服务器直接用根路径，localhost:4321 即首页
 export default defineConfig({
 	site: 'https://yihujiua.github.io',
-	base: '/astro-blog/',
+	base: import.meta.env.PROD ? '/astro-blog/' : '/',
 	integrations: [mdx(), sitemap()],
 	fonts: [
 		{
