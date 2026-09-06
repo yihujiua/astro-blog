@@ -5,6 +5,9 @@ export const SITE_TITLE = '我的技术博客';
 export const SITE_DESCRIPTION = '记录 ESP32、智能家居与全栈开发';
 
 export const AUTHOR = 'yihujiua';
+/** 人机合作署名：AI 参与者名称与展示文案 */
+export const AI_PARTNER = 'AI';
+export const CO_AUTHOR_LABEL = `${AUTHOR} × ${AI_PARTNER}`;
 export const EMAIL = 'hi@yihujiua.com';
 export const GITHUB_URL = 'https://github.com/yihujiua';
 

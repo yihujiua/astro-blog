@@ -1,8 +1,9 @@
 ---
 import FormattedDate from '../../components/FormattedDate.astro';
+import AuthorByline from '../../components/AuthorByline.astro';
 import PostCard from '../../components/PostCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { AUTHOR, SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 import { getSortedPosts, readingMinutes } from '../../utils/posts';
 
 const base = import.meta.env.BASE_URL;
@@ -32,8 +33,7 @@ const rest = posts.filter((p) => p !== featured);
 					<h2 class="featured-title">{featured.data.title}</h2>
 					<p class="featured-desc">{featured.data.description}</p>
 					<div class="byline">
-						<span class="avatar">{AUTHOR.slice(0, 2).toUpperCase()}</span>
-						<span class="author">{AUTHOR}</span>
+						<AuthorByline />
 						<span class="dot">·</span>
 						<span>
 							<FormattedDate date={featured.data.pubDate} />
@@ -176,22 +176,6 @@ const rest = posts.filter((p) => p !== featured);
 	}
 	.dot {
 		color: rgb(var(--gray));
-	}
-	.avatar {
-		width: 1.5rem;
-		height: 1.5rem;
-		border-radius: var(--radius);
-		background: var(--marker);
-		color: var(--paper);
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.7rem;
-		font-weight: 700;
-	}
-	.author {
-		color: rgb(var(--black));
-		font-weight: 600;
 	}
 
 	/* ── cards ── */

@@ -3,8 +3,9 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import type { MarkdownHeading } from 'astro:content';
 import FormattedDate from '../../components/FormattedDate.astro';
+import AuthorByline from '../../components/AuthorByline.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { AUTHOR } from '../../consts';
+import { AI_PARTNER, AUTHOR } from '../../consts';
 import { getSortedPosts, relatedPosts } from '../../utils/posts';
 import type { Post } from '../../utils/posts';
 
@@ -47,7 +48,11 @@ const jsonLd = {
 	description,
 	datePublished: pubDate.toISOString(),
 	dateModified: (updatedDate ?? pubDate).toISOString(),
-		author: { '@type': 'Person', name: AUTHOR },
+	// 人机合作署名：AI 声明为虚拟作者
+	author: [
+		{ '@type': 'Person', name: AUTHOR },
+		{ '@type': 'Person', name: AI_PARTNER },
+	],
 	url: new URL(Astro.url.pathname, Astro.site).toString(),
 	...(heroImage && { image: new URL(heroImage.src, Astro.site).toString() }),
 };
@@ -95,7 +100,11 @@ const toc: TocItem[] = flattenHeadings(headings)
 
 				<h1>{title}</h1>
 				<div class="post-date">
-					<FormattedDate date={pubDate} />
+					<AuthorByline />
+					<span class="dot">·</span>
+					<span>
+						<FormattedDate date={pubDate} />
+					</span>
 					{updatedDate && (
 						<span class="last-updated">
 							· 更新于 <FormattedDate date={updatedDate} />
@@ -255,10 +264,16 @@ const toc: TocItem[] = flattenHeadings(headings)
 		margin: 0 0 1.25rem;
 	}
 	.post-date {
-		display: block;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
 		font-size: 0.875rem;
 		color: rgb(var(--gray));
 		margin-bottom: 2rem;
+	}
+	.post-date .dot {
+		color: rgb(var(--gray));
 	}
 	.last-updated {
 		font-style: italic;

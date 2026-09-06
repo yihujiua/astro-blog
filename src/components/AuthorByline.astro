@@ -1,0 +1,41 @@
+---
+import { AI_PARTNER, AUTHOR, CO_AUTHOR_LABEL } from '../consts';
+
+// 人机合作署名：作者头像块 + AI 头像块 + 「作者 × AI」文字
+const initials = AUTHOR.slice(0, 2).toUpperCase();
+---
+
+<span class="byline">
+	<span class="avatar" title={AUTHOR}>{initials}</span>
+	<span class="avatar ai" title={AI_PARTNER}>{AI_PARTNER}</span>
+	<span class="name">{CO_AUTHOR_LABEL}</span>
+</span>
+
+<style>
+	.byline {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+	.avatar {
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: var(--radius);
+		background: var(--marker);
+		color: var(--paper);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 0.62rem;
+		font-weight: 700;
+	}
+	.avatar.ai {
+		background: var(--accent);
+		color: var(--paper);
+	}
+	.name {
+		color: rgb(var(--black));
+		font-weight: 600;
+		white-space: nowrap;
+	}
+</style>
