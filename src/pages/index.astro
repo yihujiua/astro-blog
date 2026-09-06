@@ -5,11 +5,11 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 const base = import.meta.env.BASE_URL;
 ---
 
-<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} header={false} footer={false}>
 	<style>
 			.page {
 				position: relative;
-				min-height: calc(100vh - 4em); /* 全屏 Hero，扣除顶栏高度 */
+				min-height: 100vh; /* 无导航栏，Hero 直接铺满全屏 */
 				display: flex;
 				flex-direction: column;
 				align-items: center;
